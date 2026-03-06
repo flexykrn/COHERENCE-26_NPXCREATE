@@ -1,6 +1,5 @@
 /**
  * API Configuration
- * Centralized configuration for backend endpoints
  */
 
 export const API_CONFIG = {
