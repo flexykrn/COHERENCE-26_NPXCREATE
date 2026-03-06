@@ -1,6 +1,15 @@
 /secrets
 /.github
-/backend
+/backend/data
+
+
+# venv / virtual environments
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
 
 # Environment variables and secrets
 .env
@@ -31,6 +40,13 @@ node_modules/
 out/
 build/
 dist/
+
+# Hardhat build artifacts
+backend/blockchain/artifacts/
+backend/blockchain/cache/
+backend/blockchain/typechain-types/
+backend/blockchain/deployments.json
+backend/blockchain/merkle-proofs/
 
 # Logs
 *.log
