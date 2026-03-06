@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Sky Background -->
+  <rect width="800" height="600" fill="#E0F2FE"/>
+  
+  <!-- Base Platform -->
+  <rect x="50" y="480" width="700" height="20" fill="#8B7355"/>
+  <rect x="40" y="500" width="720" height="30" fill="#6B5844"/>
+  
+  <!-- Main Building Base -->
+  <rect x="100" y="380" width="600" height="100" fill="#D4A574"/>
+  
+  <!-- Central Dome Support -->
+  <rect x="300" y="200" width="200" height="180" fill="#C4956C"/>
+  
+  <!-- Central Dome -->
+  <ellipse cx="400" cy="200" rx="120" ry="80" fill="#8B7355"/>
+  <ellipse cx="400" cy="200" rx="100" ry="65" fill="#A0826D"/>
+  
+  <!-- Dome Top -->
+  <circle cx="400" cy="140" r="30" fill="#DAA520"/>
+  <rect x="395" y="110" width="10" height="30" fill="#FFD700"/>
+  <circle cx="400" cy="110" r="8" fill="#FF6B6B"/>
+  
+  <!-- Left Wing -->
+  <rect x="100" y="300" width="180" height="180" fill="#D4A574"/>
+  <rect x="110" y="310" width="160" height="20" fill="#8B7355"/>
+  
+  <!-- Right Wing -->
+  <rect x="520" y="300" width="180" height="180" fill="#D4A574"/>
+  <rect x="530" y="310" width="160" height="20" fill="#8B7355"/>
+  
+  <!-- Columns (Left Wing) -->
+  <rect x="120" y="340" width="15" height="140" fill="#F5E6D3"/>
+  <rect x="150" y="340" width="15" height="140" fill="#F5E6D3"/>
+  <rect x="180" y="340" width="15" height="140" fill="#F5E6D3"/>
+  <rect x="210" y="340" width="15" height="140" fill="#F5E6D3"/>
+  <rect x="240" y="340" width="15" height="140" fill="#F5E6D3"/>
+  
+  <!-- Columns (Right Wing) -->
+  <rect x="545" y="340" width="15" height="140" fill="#F5E6D3"/>
+  <rect x="575" y="340" width="15" height="140" fill="#F5E6D3"/>
+  <rect x="605" y="340" width="15" height="140" fill="#F5E6D3"/>
+  <rect x="635" y="340" width="15" height="140" fill="#F5E6D3"/>
+  <rect x="665" y="340" width="15" height="140" fill="#F5E6D3"/>
+  
+  <!-- Central Entrance -->
+  <rect x="350" y="400" width="100" height="80" fill="#6B5844"/>
+  <path d="M 350 400 L 400 360 L 450 400 Z" fill="#8B7355"/>
+  
+  <!-- Windows (Left Wing) -->
+  <rect x="125" y="350" width="10" height="15" fill="#4A90E2"/>
+  <rect x="155" y="350" width="10" height="15" fill="#4A90E2"/>
+  <rect x="185" y="350" width="10" height="15" fill="#4A90E2"/>
+  <rect x="215" y="350" width="10" height="15" fill="#4A90E2"/>
+  <rect x="245" y="350" width="10" height="15" fill="#4A90E2"/>
+  
+  <!-- Windows (Right Wing) -->
+  <rect x="550" y="350" width="10" height="15" fill="#4A90E2"/>
+  <rect x="580" y="350" width="10" height="15" fill="#4A90E2"/>
+  <rect x="610" y="350" width="10" height="15" fill="#4A90E2"/>
+  <rect x="640" y="350" width="10" height="15" fill="#4A90E2"/>
+  <rect x="670" y="350" width="10" height="15" fill="#4A90E2"/>
+  
+  <!-- Decorative Elements on Dome -->
+  <circle cx="400" cy="180" r="3" fill="#FFD700"/>
+  <circle cx="385" cy="190" r="3" fill="#FFD700"/>
+  <circle cx="415" cy="190" r="3" fill="#FFD700"/>
+  <circle cx="370" cy="200" r="3" fill="#FFD700"/>
+  <circle cx="430" cy="200" r="3" fill="#FFD700"/>
+  
+  <!-- Central Building Windows -->
+  <rect x="320" y="240" width="20" height="25" fill="#4A90E2"/>
+  <rect x="360" y="240" width="20" height="25" fill="#4A90E2"/>
+  <rect x="420" y="240" width="20" height="25" fill="#4A90E2"/>
+  <rect x="460" y="240" width="20" height="25" fill="#4A90E2"/>
+  
+  <!-- Steps -->
+  <rect x="200" y="480" width="400" height="5" fill="#9B8B7E"/>
+  <rect x="220" y="485" width="360" height="5" fill="#8B7B6E"/>
+  <rect x="240" y="490" width="320" height="5" fill="#7B6B5E"/>
+  <rect x="260" y="495" width="280" height="5" fill="#6B5B4E"/>
+  
+  <!-- Flag Pole -->
+  <rect x="398" y="80" width="4" height="30" fill="#4A4A4A"/>
+  
+  <!-- Indian Flag -->
+  <rect x="402" y="85" width="60" height="6" fill="#FF9933"/>
+  <rect x="402" y="91" width="60" height="6" fill="#FFFFFF"/>
+  <rect x="402" y="97" width="60" height="6" fill="#138808"/>
+  <circle cx="432" cy="94" r="3" fill="#000080"/>
+</svg>

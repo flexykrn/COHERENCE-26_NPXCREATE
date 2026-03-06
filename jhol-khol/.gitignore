@@ -33,6 +33,22 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# Markdown files - no documentation in repo
+*.md
+**/*.md
+
+# API Keys, secrets, and sensitive data
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+config/secrets/
+**/api-keys.json
+**/credentials.json
+**/.credentials
+**/service-account*.json
+
 # vercel
 .vercel
 

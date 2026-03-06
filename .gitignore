@@ -1,3 +1,43 @@
 /secrets
 /.github
+/backend
 
+# Environment variables and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+config/secrets/
+
+# API Keys and sensitive data
+**/api-keys.json
+**/credentials.json
+**/.credentials
+**/service-account*.json
+
+# Markdown files
+*.md
+**/*.md
+
+# Node modules
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
