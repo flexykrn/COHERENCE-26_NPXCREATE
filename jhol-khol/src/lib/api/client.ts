@@ -27,6 +27,7 @@ import type {
   WelfareScheme,
   SchemeSummaryResponse,
   SchemeAnomalyResponse,
+  SchemeAnomaliesResponse,
   SchemeDetailResponse,
   AnomalyQueryParams,
   BudgetFlowQueryParams,
@@ -199,8 +200,8 @@ export const apiClient = {
     return fetchApi<SchemeSummaryResponse>(API_CONFIG.ENDPOINTS.SCHEMES_SUMMARY);
   },
 
-  async getSchemesAnomalies(): Promise<{ anomalies: SchemeAnomalyResponse[] }> {
-    return fetchApi<{ anomalies: SchemeAnomalyResponse[] }>(API_CONFIG.ENDPOINTS.SCHEMES_ANOMALIES);
+  async getSchemesAnomalies(): Promise<SchemeAnomaliesResponse> {
+    return fetchApi<SchemeAnomaliesResponse>(API_CONFIG.ENDPOINTS.SCHEMES_ANOMALIES);
   },
 
   async getSchemeDetail(id: number): Promise<SchemeDetailResponse> {
