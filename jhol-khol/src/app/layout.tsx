@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Jhol Khol - Government Transparency Platform",
+  title: "Jhol Khol - Budget Transparency Platform",
   description: "Track government schemes, report irregularities, and ensure accountability in governance. Empowering citizens with transparency.",
   keywords: ["government transparency", "public schemes", "accountability", "corruption reporting", "civic tech"],
 };
