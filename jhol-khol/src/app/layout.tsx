@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { LiveAlertsProvider } from "@/components/LiveAlertsProvider";
+import { Web3Provider } from "@/lib/blockchain/Web3Provider";
+import { AuthProvider } from "@/lib/AuthContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,10 +32,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <LiveAlertsProvider>
-          {children}
-          <Toaster richColors position="top-right" expand={true} />
-        </LiveAlertsProvider>
+        <Web3Provider>
+          <AuthProvider>
+            <LiveAlertsProvider>
+              {children}
+              <Toaster richColors position="top-right" expand={true} />
+            </LiveAlertsProvider>
+          </AuthProvider>
+        </Web3Provider>
       </body>
     </html>
   );
