@@ -46,7 +46,8 @@ export function LiveAlertsProvider({ children }: { children: React.ReactNode }) 
 
       const formatAmount = (amount: number) => {
         if (amount >= 1) return `₹${amount.toFixed(2)} Cr`;
-        return `₹${(amount * 10).toFixed(2)} L`;
+        if (amount >= 0.1) return `₹${(amount * 10).toFixed(2)} L`;
+        return `₹${(amount * 1000).toFixed(2)} K`;
       };
 
       toast.custom(
