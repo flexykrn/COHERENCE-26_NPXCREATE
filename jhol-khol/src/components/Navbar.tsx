@@ -10,9 +10,9 @@ export default function Navbar() {
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Budget Map', href: '/budget-dashboard' },
+    { name: 'Analytics', href: '/analytics/lapse-risk' },
     { name: 'Schemes', href: '/schemes' },
     { name: 'Reports', href: '/reports' },
-    { name: 'Dashboard', href: '/dashboard' },
     { name: 'About', href: '/about' },
   ];
 
