@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -48,9 +47,14 @@ export default function Navbar() {
                 <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-amber-500 to-orange-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
               </Link>
             ))}
-            <button className="ml-4 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:shadow-lg hover:shadow-amber-500/50 transition-all duration-300 font-semibold hover:scale-105">
-              Report Issue
-            </button>
+            <div className="ml-4">
+              <Link
+                href="/blockchain"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-amber-500/40 text-amber-500 hover:bg-amber-500/10 text-sm font-semibold transition-all"
+              >
+                <span>⛓</span> Auditor Portal
+              </Link>
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -81,12 +85,20 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
-            <button className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-semibold shadow-lg">
-              Report Issue
-            </button>
+            <div className="mt-4 pt-4 border-t border-gray-200/50 dark:border-gray-800/50">
+              <Link
+                href="/blockchain"
+                className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-amber-500/40 text-amber-500 hover:bg-amber-500/10 font-semibold transition-all"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span>⛓</span> Auditor Portal
+              </Link>
+            </div>
           </div>
         </div>
       )}
     </nav>
   );
 }
+
+
