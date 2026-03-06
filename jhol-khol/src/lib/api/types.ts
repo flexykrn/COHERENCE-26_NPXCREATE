@@ -1,6 +1,5 @@
 /**
  * TypeScript interfaces for Backend API responses
- * Based on COHERENCE-26 Budget Flow Intelligence Platform
  */
 
 // ============================================================================
