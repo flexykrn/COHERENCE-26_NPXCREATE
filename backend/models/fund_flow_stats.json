@@ -1,0 +1,65 @@
+{
+  "model": "fund_flow_inefficiency",
+  "framework": "TensorFlow 2.16.1",
+  "trained_at": "2026-03-06T22:52:04.833771Z",
+  "unit": "department x fiscal_year x quarter",
+  "samples": 600,
+  "inefficiency_rate_pct": 29.67,
+  "features": [
+    "revision_ratio",
+    "actual_spend_ratio",
+    "target_gap",
+    "is_capital",
+    "is_q4",
+    "dept_tx_count_norm",
+    "vendor_diversity_norm",
+    "avg_tx_size_norm",
+    "q4_spend_frac",
+    "hist_util_avg_norm",
+    "ddo_cnt_norm"
+  ],
+  "label_def": "actual_spend_ratio < 0.75 AND (revision_ratio < 0.93 OR target_gap < -0.12)",
+  "scaler_mean": [
+    0.9981970609476168,
+    0.45361775532364845,
+    0.5566104630629222,
+    0.5041666666666667,
+    0.24583333333333332,
+    0.6027152161424358,
+    0.670809385056297,
+    0.8632341764867306,
+    0.568927692125241,
+    0.8613183292249839,
+    0.8092262018471956
+  ],
+  "scaler_scale": [
+    0.06655676271897489,
+    0.18167897734230556,
+    0.18847410365773354,
+    0.4999826385874703,
+    0.4305801964275133,
+    0.1509384580153122,
+    0.16019837839113335,
+    0.04099875949547574,
+    0.04568661113672171,
+    0.04185270185175131,
+    0.16560005296356625
+  ],
+  "performance": {
+    "accuracy": 0.9167,
+    "precision": 0.7955,
+    "recall": 0.9722,
+    "f1": 0.875,
+    "auc_roc": 0.9732
+  },
+  "confusion_matrix": [
+    [
+      75,
+      9
+    ],
+    [
+      1,
+      35
+    ]
+  ]
+}

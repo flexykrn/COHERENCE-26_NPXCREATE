@@ -1,0 +1,76 @@
+{
+  "model": "leakage_detector",
+  "framework": "TensorFlow 2.16.1",
+  "trained_at": "2026-03-06T22:52:31.083740Z",
+  "unit": "scheme x district x quarter",
+  "samples": 3600,
+  "leakage_rate_pct": 27.75,
+  "label_thresholds": {
+    "coverage_gap_p75": 0.0008,
+    "amount_cov_median": 0.241,
+    "cpb_ratio_p80": 1.007
+  },
+  "label_def": "leakage = (gap > gap_p75 AND amount_cov > median) OR cpb_ratio > p80",
+  "features": [
+    "amount_coverage_ratio",
+    "bene_coverage_ratio",
+    "coverage_gap",
+    "cpb_ratio",
+    "is_dbt",
+    "is_q4",
+    "is_q1",
+    "planned_amount_norm",
+    "scheme_norm",
+    "district_norm",
+    "district_risk_norm",
+    "zero_beneficiary_flag",
+    "over_disbursed_flag"
+  ],
+  "scaler_mean": [
+    0.10999724704274236,
+    0.10967094844866855,
+    0.5001631491507094,
+    0.10058754518007239,
+    0.5517361111111111,
+    0.2465277777777778,
+    0.24722222222222223,
+    0.133321571330493,
+    0.4960648148605186,
+    0.49628969214067586,
+    0.9400428218146165,
+    0.0,
+    0.0
+  ],
+  "scaler_scale": [
+    0.0652835473807247,
+    0.06531596470481552,
+    0.00023821631482527097,
+    0.001497081274212777,
+    0.4973161718736887,
+    0.43098936478958744,
+    0.4313970271823047,
+    0.23726373237466908,
+    0.3002260820411533,
+    0.29693800028271394,
+    0.036922964597068564,
+    1.0,
+    1.0
+  ],
+  "performance": {
+    "accuracy": 0.9472,
+    "precision": 0.8584,
+    "recall": 0.97,
+    "f1": 0.9108,
+    "auc_roc": 0.9864
+  },
+  "confusion_matrix": [
+    [
+      488,
+      32
+    ],
+    [
+      6,
+      194
+    ]
+  ]
+}
