@@ -9,15 +9,25 @@ export default function SchemesPage() {
   const [schemes, setSchemes] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     fetch('/api/schemes')
       .then(res => res.json())
-      .then(data => setSchemes(data.data))
-      .catch(err => console.error(err));
+      .then(data => {
+        // Ensure we always set an array
+        setSchemes(Array.isArray(data.data) ? data.data : []);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to fetch schemes:', err);
+        setSchemes([]);
+        setLoading(false);
+      });
   }, []);
 
-  const filteredSchemes = schemes.filter(scheme => {
+  const filteredSchemes = (schemes || []).filter(scheme => {
     const matchesSearch = scheme.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          scheme.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'All' || scheme.status === filterStatus;
@@ -76,7 +86,27 @@ export default function SchemesPage() {
             </div>
           </div>
 
+          {/* Loading State */}
+          {loading && (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">Loading schemes...</p>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && filteredSchemes.length === 0 && (
+            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
+                {searchTerm || filterStatus !== 'All' 
+                  ? 'No schemes match your search criteria' 
+                  : 'No schemes available'}
+              </p>
+            </div>
+          )}
+
           {/* Schemes Grid */}
+          {!loading && filteredSchemes.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredSchemes.map((scheme) => (
               <div 
@@ -141,6 +171,7 @@ export default function SchemesPage() {
               </div>
             ))}
           </div>
+          )}
         </div>
       </div>
 

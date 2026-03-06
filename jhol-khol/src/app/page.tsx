@@ -16,12 +16,21 @@ import {
 
 export default function Home() {
   const [stats, setStats] = useState<any>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
+    setStatsLoading(true);
     fetch('/api/stats')
       .then(res => res.json())
-      .then(data => setStats(data.data))
-      .catch(err => console.error(err));
+      .then(data => {
+        setStats(data.data || null);
+        setStatsLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to fetch stats:', err);
+        setStats(null);
+        setStatsLoading(false);
+      });
   }, []);
 
   const features = [
@@ -105,14 +114,20 @@ export default function Home() {
               {/* Modern CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link 
-                  href="/schemes"
+                  href="/budget-dashboard"
                   className="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-amber-400 to-orange-500 text-gray-900 rounded-2xl font-bold overflow-hidden shadow-2xl hover:shadow-amber-500/50 transition-all duration-300 transform hover:scale-105"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-amber-300 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <span className="relative flex items-center gap-2">
-                    Explore Schemes
+                    View Budget Map
                     <ArrowRightIcon className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                   </span>
+                </Link>
+                <Link 
+                  href="/schemes"
+                  className="group inline-flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-xl border-2 border-white/30 text-white rounded-2xl font-bold hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-xl"
+                >
+                  Explore Schemes
                 </Link>
                 <Link 
                   href="/reports"

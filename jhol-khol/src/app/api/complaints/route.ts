@@ -1,58 +1,44 @@
 import { NextResponse } from 'next/server';
 
-// Mock database - Replace with actual database in production
-const complaints = [
-  {
-    id: 1,
-    title: "Road Construction Delay",
-    description: "NH-48 expansion project delayed by 6 months without explanation",
-    category: "Infrastructure",
-    location: "Mumbai, Maharashtra",
-    status: "Under Review",
-    priority: "High",
-    submittedBy: "Citizen",
-    submittedDate: "2026-02-15",
-    upvotes: 234,
-  },
-  {
-    id: 2,
-    title: "Irregular Fund Allocation",
-    description: "Discrepancy in rural development fund distribution in district",
-    category: "Finance",
-    location: "Varanasi, UP",
-    status: "Investigating",
-    priority: "Critical",
-    submittedBy: "Anonymous",
-    submittedDate: "2026-02-20",
-    upvotes: 567,
-  },
-  {
-    id: 3,
-    title: "Ghost Beneficiaries in Scheme",
-    description: "Fake beneficiaries found in housing scheme records",
-    category: "Welfare",
-    location: "Bengaluru, Karnataka",
-    status: "Resolved",
-    priority: "Critical",
-    submittedBy: "Whistleblower",
-    submittedDate: "2026-01-10",
-    upvotes: 892,
-  },
-];
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-export async function GET() {
-  return NextResponse.json({ success: true, data: complaints });
+// Proxy to Python FastAPI backend - Anomalies endpoint
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const queryString = searchParams.toString();
+    
+    const response = await fetch(
+      `${BACKEND_URL}/api/anomalies${queryString ? '?' + queryString : ''}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Backend API responded with status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return NextResponse.json({ success: true, data: data.data || [] });
+  } catch (error) {
+    console.error('Failed to fetch anomalies from backend:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch anomalies from backend' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: Request) {
+  // For complaints/reports submission, we can keep this as a separate endpoint
+  // or integrate with the anomaly system later
   const body = await request.json();
-  const newComplaint = {
-    id: complaints.length + 1,
-    ...body,
-    status: "Submitted",
-    submittedDate: new Date().toISOString().split('T')[0],
-    upvotes: 0,
-  };
-  complaints.push(newComplaint);
-  return NextResponse.json({ success: true, data: newComplaint });
+  return NextResponse.json({ 
+    success: true, 
+    message: 'Report submitted successfully',
+    data: body 
+  });
 }

@@ -13,6 +13,7 @@ import {
 export default function ReportsPage() {
   const [complaints, setComplaints] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -23,10 +24,18 @@ location: '',
   });
 
   useEffect(() => {
+    setLoading(true);
     fetch('/api/complaints')
       .then(res => res.json())
-      .then(data => setComplaints(data.data))
-      .catch(err => console.error(err));
+      .then(data => {
+        setComplaints(Array.isArray(data.data) ? data.data : []);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to fetch complaints:', err);
+        setComplaints([]);
+        setLoading(false);
+      });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -196,10 +205,27 @@ location: '',
             </div>
           )}
 
+          {/* Loading State */}
+          {!showForm && loading && (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">Loading reports...</p>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!showForm && !loading && complaints.length === 0 && (
+            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
+                No reports available. Be the first to report an issue!
+              </p>
+            </div>
+          )}
+
           {/* Reports List */}
-          {!showForm && (
+          {!showForm && !loading && complaints.length > 0 && (
             <div className="space-y-6">
-              {complaints.map((complaint) => (
+              {(complaints || []).map((complaint) => (
                 <div 
                   key={complaint.id}
                   className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6"
