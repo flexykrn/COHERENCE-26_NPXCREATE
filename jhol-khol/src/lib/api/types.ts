@@ -89,7 +89,7 @@ export interface AnomalyScanResponse {
 export interface BudgetFlowNode {
   id: string;
   name: string;
-  type: 'ministry' | 'department' | 'district';
+  type: 'ministry' | 'department' | 'district' | 'ddo';
 }
 
 export interface BudgetFlowLink {
@@ -168,13 +168,68 @@ export interface MLLapsePredictResponse {
   prediction_date: string;
 }
 
+export interface MLFeatureImportance {
+  feature: string;
+  weight: number;
+  importance: number;
+  direction: string;
+}
+
 export interface MLModelStatsResponse {
-  model_type: string;
-  training_accuracy: number;
-  validation_accuracy: number;
-  confusion_matrix: number[][];
-  feature_importance: Record<string, number>;
-  last_trained: string;
+  model_info: {
+    type: string;
+    implementation: string;
+    training_years: string[];
+    prediction_year: string;
+    epochs: number;
+    learning_rate: number;
+    l2_lambda: number;
+    decision_threshold: number;
+    lapse_definition: string;
+  };
+  dataset_info: {
+    total_labelled_samples: number;
+    train_samples: number;
+    validation_samples: number;
+    split_method: string;
+    warning: string;
+    label_distribution: {
+      train_lapsed: number;
+      train_not_lapsed: number;
+      val_lapsed: number;
+      val_not_lapsed: number;
+    };
+  };
+  training_metrics: {
+    note: string;
+    samples: number;
+    accuracy_pct: number;
+    log_loss: number;
+  };
+  validation_metrics: {
+    note: string;
+    samples: number;
+    accuracy_pct: number;
+    log_loss: number;
+    precision_pct: number;
+    recall_pct: number;
+    f1_score: number;
+    confusion_matrix: {
+      TP: number;
+      TN: number;
+      FP: number;
+      FN: number;
+      interpretation: string;
+    };
+  };
+  feature_importance: MLFeatureImportance[];
+  prediction_summary: {
+    total_depts: number;
+    high_lapse_risk: number;
+    safe: number;
+    avg_lapse_prob_pct: number;
+  };
+  predictions: MLLapsePrediction[];
 }
 
 export interface BudgetDNAEntry {
@@ -196,20 +251,30 @@ export interface BudgetDNAResponse {
 // ============================================================================
 
 export interface ReallocationSuggestion {
-  from_dept_id: number;
   from_dept: string;
-  to_dept_id: number;
+  from_dept_id: number;
+  from_ministry: string;
+  from_districts: string[];
+  from_state_wide: boolean;
   to_dept: string;
+  to_dept_id: number;
+  to_ministry: string;
+  to_districts: string[];
+  to_state_wide: boolean;
+  scheme_type: string;
   transfer_amount_cr: number;
-  ministry: string;
-  rationale: string;
-  risk_reduction_points: number;
+  from_lapse_risk_pct: number;
+  to_utilization_pct: number;
+  geo_justification: string;
+  estimated_risk_reduction_pts: number;
+  reason: string;
 }
 
 export interface ReallocationResponse {
   total_suggestions: number;
   total_saveable_cr: number;
   suggestions: ReallocationSuggestion[];
+  constraints_applied: string[];
 }
 
 export interface ReimbursementReallocationResponse {
@@ -237,27 +302,29 @@ export interface GeographyFootprintResponse {
 
 export interface CollusionNode {
   id: string;
-  type: 'shell_vendor' | 'colluding_ddo' | 'normal';
   label: string;
-  amount_cr?: number;
-  risk_score?: number;
+  type: 'shell_vendor' | 'colluding_ddo' | 'ddo' | 'vendor';
+  risk: number;
+  amount_cr: number;
 }
 
 export interface CollusionEdge {
   source: string;
   target: string;
   amount_cr: number;
+  dept: string;
+  district: string;
 }
 
 export interface CollusionResponse {
+  year: number;
+  nodes: CollusionNode[];
+  edges: CollusionEdge[];
   summary: {
     shell_vendors: number;
     colluding_ddos: number;
+    total_edges: number;
     total_at_risk_cr: number;
-  };
-  graph: {
-    nodes: CollusionNode[];
-    edges: CollusionEdge[];
   };
 }
 
@@ -343,6 +410,27 @@ export interface SchemeAnomalyResponse {
   severity: SeverityLevel;
   description: string;
   amount_affected_cr: number;
+}
+
+export interface SchemeAnomaly {
+  type: string;
+  severity: string;
+  risk_score: number;
+  scheme_id: number;
+  scheme_name: string;
+  scheme_category: string;
+  dept_name: string;
+  description: string;
+  evidence: Record<string, number | string>;
+  recommendation: string;
+}
+
+export interface SchemeAnomaliesResponse {
+  total_detections: number;
+  total_funds_at_risk_cr: number;
+  by_type: Record<string, number>;
+  by_severity: Record<string, number>;
+  detections: SchemeAnomaly[];
 }
 
 export interface SchemeDetailResponse {
