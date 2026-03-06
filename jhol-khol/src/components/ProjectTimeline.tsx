@@ -51,7 +51,8 @@ export default function ProjectTimeline({
 
   const formatCurrency = (value: number) => {
     if (value >= 1) return `₹${value.toFixed(2)} Cr`;
-    return `₹${(value * 10).toFixed(2)} L`;
+    if (value >= 0.1) return `₹${(value * 10).toFixed(2)} L`;
+    return `₹${(value * 1000).toFixed(2)} K`;
   };
 
   const getStatusIcon = (status: ProjectStage['status']) => {
