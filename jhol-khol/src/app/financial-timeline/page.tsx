@@ -115,6 +115,7 @@ export default function FinancialTimelinePage() {
   const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
   const [draggedProject, setDraggedProject] = useState<string | null>(null);
   const [anomalyAlert, setAnomalyAlert] = useState<boolean>(false);
+  const [anomalyDetails, setAnomalyDetails] = useState<string[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   useEffect(() => {
@@ -138,19 +139,75 @@ export default function FinancialTimelinePage() {
   }, [projects]);
 
   const detectAnomalies = () => {
-    // Check for year-end bunching (projects concentrated in last 3 months)
-    const lastThreeMonths = projects.filter(p => p.startMonth >= 9);
-    const totalAllocated = projects.reduce((sum, p) => sum + p.allocated, 0);
-    const lastThreeAllocated = lastThreeMonths.reduce((sum, p) => sum + p.allocated, 0);
+    if (projects.length === 0) {
+      setAnomalyAlert(false);
+      setAnomalyDetails([]);
+      return;
+    }
+
+    const details: string[] = [];
     
+    // Multiple anomaly detection techniques
+    const totalAllocated = projects.reduce((sum, p) => sum + p.allocated, 0);
+    const totalSpent = projects.reduce((sum, p) => sum + p.spent, 0);
+    
+    // 1. Year-end bunching detection (last 3 months)
+    const lastThreeMonths = projects.filter(p => p.startMonth >= 9);
+    const lastThreeAllocated = lastThreeMonths.reduce((sum, p) => sum + p.allocated, 0);
     const yearEndRatio = lastThreeAllocated / totalAllocated;
     
-    // Alert if more than 40% of budget is allocated to projects starting in last 3 months
-    if (yearEndRatio > 0.4) {
-      setAnomalyAlert(true);
-    } else {
-      setAnomalyAlert(false);
+    // 2. Rushed project detection (high budget + short duration in last quarter)
+    const rushedProjects = projects.filter(p => 
+      p.startMonth >= 9 && 
+      p.duration <= 2 && 
+      p.allocated > 20 &&
+      p.status !== 'completed'
+    );
+    
+    // 3. Spending velocity anomaly (low spend rate for most of year, then spike)
+    const firstNineMonths = projects.filter(p => p.startMonth < 9);
+    const firstNineSpent = firstNineMonths.reduce((sum, p) => sum + p.spent, 0);
+    const lastThreeSpent = lastThreeMonths.reduce((sum, p) => sum + p.spent, 0);
+    const spendingRatio = totalSpent > 0 ? lastThreeSpent / totalSpent : 0;
+    
+    // 4. Incomplete project bunching (multiple unfinished projects at year end)
+    const incompleteLastQuarter = projects.filter(p => 
+      p.startMonth >= 9 && 
+      p.status !== 'completed' &&
+      p.spent < p.allocated * 0.5  // Less than 50% spent
+    );
+    
+    // Check each anomaly and add details
+    const hasYearEndBunching = yearEndRatio > 0.45;
+    if (hasYearEndBunching) {
+      details.push(`${(yearEndRatio * 100).toFixed(1)}% of annual budget concentrated in final 3 months`);
     }
+    
+    const hasRushedProjects = rushedProjects.length >= 2;
+    if (hasRushedProjects) {
+      details.push(`${rushedProjects.length} high-value projects with unrealistic 2-month timelines in last quarter`);
+    }
+    
+    const hasSpendingSpike = spendingRatio > 0.5 && totalSpent > 0;
+    if (hasSpendingSpike) {
+      details.push(`${(spendingRatio * 100).toFixed(1)}% of total spending rushed in final quarter`);
+    }
+    
+    const hasIncompleteProjects = incompleteLastQuarter.length >= 3;
+    if (hasIncompleteProjects) {
+      details.push(`${incompleteLastQuarter.length} incomplete projects (< 50% spent) bunched at year-end`);
+    }
+    
+    // Add general risk indicators
+    if (details.length > 0) {
+      details.push('Pattern matches known fund leakage strategies');
+      details.push('Risk of unspent funds being rushed without proper oversight');
+    }
+    
+    const anomalyDetected = hasYearEndBunching || hasRushedProjects || hasSpendingSpike || hasIncompleteProjects;
+    
+    setAnomalyAlert(anomalyDetected);
+    setAnomalyDetails(details);
   };
 
   const handleDragStart = (projectId: string) => {
@@ -245,15 +302,20 @@ export default function FinancialTimelinePage() {
                   AI Anomaly Detection Model has flagged suspicious project allocation pattern:
                 </p>
                 <ul className="text-red-300 space-y-1 mb-4">
-                  <li>• {highRiskProjects.length} high-risk projects detected in last quarter</li>
-                  <li>• {((projects.filter(p => p.startMonth >= 9).reduce((s, p) => s + p.allocated, 0) / totalAllocated) * 100).toFixed(1)}% of annual budget concentrated in final 3 months</li>
-                  <li>• Pattern matches known fund leakage strategies</li>
-                  <li>• Risk of unspent funds being rushed without proper oversight</li>
+                  {anomalyDetails.map((detail, idx) => (
+                    <li key={idx}>• {detail}</li>
+                  ))}
                 </ul>
                 <div className="flex gap-3">
                   <span className="px-4 py-2 bg-red-500 text-white rounded-lg font-bold text-sm">
                     CRITICAL ALERT
                   </span>
+                  <button
+                    onClick={() => router.push('/reallocation-map')}
+                    className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-sm transition-colors"
+                  >
+                    Open Reallocation Map
+                  </button>
                   <span className="px-4 py-2 bg-white/10 text-white rounded-lg font-bold text-sm">
                     Recommend: Redistribute projects across quarters
                   </span>
