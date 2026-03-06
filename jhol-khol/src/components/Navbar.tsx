@@ -16,64 +16,71 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed w-full bg-white/95 backdrop-blur-sm shadow-sm z-50 dark:bg-gray-900/95">
+    <nav className="fixed w-full bg-white/70 dark:bg-gray-900/70 backdrop-blur-2xl shadow-lg border-b border-gray-200/50 dark:border-gray-800/50 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">JK</span>
+        <div className="flex justify-between items-center h-20">
+          {/* Logo with Modern Design - Parliament Theme */}
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="relative w-12 h-12 bg-gradient-to-br from-red-600 to-rose-700 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+              <span className="text-white font-black text-xl">JK</span>
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500 to-rose-600 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity blur-lg"></div>
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Jhol Khol
-            </span>
+            <div>
+              <span className="text-2xl font-black bg-gradient-to-r from-red-700 via-rose-600 to-stone-700 bg-clip-text text-transparent">
+                Jhol Khol
+              </span>
+              <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold -mt-1">
+                Expose Truth
+              </div>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-2">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors font-medium"
+                className="relative px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors font-semibold group"
               >
                 {item.name}
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-600 to-rose-700 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
               </Link>
             ))}
-            <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full hover:shadow-lg transition-all duration-300 font-medium">
+            <button className="ml-4 px-6 py-3 bg-gradient-to-r from-red-600 to-rose-700 text-white rounded-xl hover:shadow-lg hover:shadow-red-600/50 transition-all duration-300 font-semibold hover:scale-105">
               Report Issue
             </button>
           </div>
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="md:hidden p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
-              <XMarkIcon className="h-6 w-6" />
+              <XMarkIcon className="h-6 w-6 text-gray-700 dark:text-gray-300" />
             ) : (
-              <Bars3Icon className="h-6 w-6" />
+              <Bars3Icon className="h-6 w-6 text-gray-700 dark:text-gray-300" />
             )}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu with Glass Morphism */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-900 border-t dark:border-gray-800">
-          <div className="px-4 py-4 space-y-3">
+        <div className="md:hidden bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl border-t border-gray-200/50 dark:border-gray-800/50">
+          <div className="px-4 py-6 space-y-2">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="block px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 font-medium"
+                className="block px-5 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-red-600/10 hover:to-rose-700/10 hover:text-red-600 dark:hover:text-red-400 font-semibold transition-all"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.name}
               </Link>
             ))}
-            <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full font-medium">
+            <button className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-red-600 to-rose-700 text-white rounded-xl font-semibold shadow-lg">
               Report Issue
             </button>
           </div>

@@ -48,210 +48,277 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-red-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
       <Navbar />
       
-      {/* Hero Section with Parliament Building */}
-      <section className="relative pt-20 pb-32 overflow-hidden min-h-screen flex items-center">
-        {/* Background Image with Overlay */}
+      {/* Hero Section with Parliament Building Background */}
+      <section className="relative pt-20 pb-20 overflow-hidden min-h-screen flex items-center">
+        {/* Background Image with Blur */}
         <div className="absolute inset-0 z-0">
           <Image
             src="/parliament-building.jpg"
             alt="Parliament Building"
             fill
             priority
-            className="object-cover object-center"
-            quality={90}
+            className="object-cover object-center scale-105 blur-sm"
+            quality={95}
           />
-          {/* Gradient Overlays for readability and theme */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/95 via-purple-900/90 to-blue-800/95 dark:from-blue-950/98 dark:via-purple-950/95 dark:to-blue-900/98"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-blue-950/50"></div>
-          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+          {/* Modern Gradient Overlay - Red Sandstone Theme */}
+          <div className="absolute inset-0 bg-gradient-to-br from-red-900/85 via-stone-800/80 to-rose-900/85"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(220,38,38,0.2),transparent_50%)]"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(17,94,89,0.15),transparent_50%)]"></div>
         </div>
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left Content */}
             <div className="space-y-8">
-              <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md rounded-full border border-white/30">
-                <span className="text-white font-semibold text-sm drop-shadow-lg">
+              {/* Badge with Glass Morphism */}
+              <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+                <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                <span className="text-white font-semibold text-sm tracking-wide">
                   🇮🇳 Transparency • Accountability • Progress
                 </span>
               </div>
               
-              <h1 className="text-5xl md:text-7xl font-bold leading-tight">
-                <span className="bg-gradient-to-r from-amber-300 via-orange-200 to-amber-400 bg-clip-text text-transparent drop-shadow-2xl">
-                  Jhol Khol
-                </span>
-                <br />
-                <span className="text-white drop-shadow-2xl">
-                  Expose the Truth
-                </span>
-              </h1>
+              {/* Main Heading with Modern Typography */}
+              <div className="space-y-4">
+                <h1 className="text-6xl md:text-8xl font-black leading-tight tracking-tight">
+                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-200 via-amber-100 to-stone-200 drop-shadow-2xl">
+                    Jhol Khol
+                  </span>
+                  <span className="block text-white drop-shadow-2xl mt-2">
+                    Expose Truth
+                  </span>
+                </h1>
+              </div>
               
-              <p className="text-xl text-gray-100 leading-relaxed drop-shadow-lg">
-                Empowering citizens with transparency in government schemes. 
-                Track public funds, report irregularities, and ensure accountability 
-                in governance.
-              </p>
+              {/* Description with Glass Card */}
+              <div className="bg-white/10 backdrop-blur-2xl rounded-2xl p-6 border border-white/20 shadow-2xl">
+                <p className="text-lg text-gray-100 leading-relaxed">
+                  Empowering citizens with transparency in government schemes. 
+                  Track public funds, report irregularities, and ensure accountability 
+                  in governance.
+                </p>
+              </div>
               
+              {/* Modern CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link 
                   href="/schemes"
-                  className="group inline-flex items-center justify-center px-8 py-4 bg-white text-blue-900 rounded-full font-semibold hover:bg-amber-400 hover:text-blue-950 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
+                  className="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-red-600 to-rose-700 text-white rounded-2xl font-bold overflow-hidden shadow-2xl hover:shadow-red-500/50 transition-all duration-300 transform hover:scale-105"
                 >
-                  Explore Schemes
-                  <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-rose-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <span className="relative flex items-center gap-2">
+                    Explore Schemes
+                    <ArrowRightIcon className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
                 </Link>
                 <Link 
                   href="/reports"
-                  className="inline-flex items-center justify-center px-8 py-4 border-2 border-white/50 backdrop-blur-sm bg-white/10 text-white rounded-full font-semibold hover:bg-white hover:text-blue-900 hover:border-white transition-all duration-300 transform hover:-translate-y-1"
+                  className="group inline-flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-xl border-2 border-white/30 text-white rounded-2xl font-bold hover:bg-white/20 hover:border-white/50 transition-all duration-300 shadow-xl"
                 >
                   Report Issue
                 </Link>
               </div>
 
-              {/* Quick Stats */}
+              {/* Stats with Glass Morphism */}
               {stats && (
-                <div className="grid grid-cols-2 gap-4 pt-8">
-                  <div className="bg-white/20 backdrop-blur-md border border-white/30 p-6 rounded-xl hover:bg-white/30 transition-all duration-300">
-                    <div className="text-3xl font-bold text-amber-300 drop-shadow-lg">
-                      {stats.activeSchemes}
+                <div className="grid grid-cols-2 gap-4 pt-4">
+                  <div className="group relative bg-white/10 backdrop-blur-2xl border border-white/20 p-6 rounded-2xl hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl">
+                    <div className="absolute inset-0 bg-gradient-to-br from-red-500/0 to-red-500/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative">
+                      <div className="text-4xl font-black text-red-300 drop-shadow-lg mb-1">
+                        {stats.activeSchemes}
+                      </div>
+                      <div className="text-sm text-gray-200 font-semibold">Active Schemes</div>
                     </div>
-                    <div className="text-sm text-gray-100 font-semibold">Active Schemes</div>
                   </div>
-                  <div className="bg-white/20 backdrop-blur-md border border-white/30 p-6 rounded-xl hover:bg-white/30 transition-all duration-300">
-                    <div className="text-3xl font-bold text-amber-300 drop-shadow-lg">
-                      {stats.complaintsResolved}
+                  <div className="group relative bg-white/10 backdrop-blur-2xl border border-white/20 p-6 rounded-2xl hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl">
+                    <div className="absolute inset-0 bg-gradient-to-br from-teal-500/0 to-teal-500/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative">
+                      <div className="text-4xl font-black text-teal-300 drop-shadow-lg mb-1">
+                        {stats.complaintsResolved}
+                      </div>
+                      <div className="text-sm text-gray-200 font-semibold">Issues Resolved</div>
                     </div>
-                    <div className="text-sm text-gray-100 font-semibold">Issues Resolved</div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Right Content - Floating Card */}
+            {/* Right Content - Floating Glass Card */}
             <div className="relative lg:block hidden">
-              <div className="relative bg-white/10 backdrop-blur-xl border border-white/30 rounded-2xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-500">
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center">
-                      <CheckCircleIcon className="h-7 w-7 text-blue-900" />
+              {/* Main Glass Card */}
+              <div className="relative bg-white/10 backdrop-blur-3xl border border-white/30 rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-700">
+                {/* Decorative glow - Red Sandstone Theme */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-red-600 to-rose-700 rounded-3xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                
+                <div className="relative space-y-6">
+                  {/* Header */}
+                  <div className="flex items-center gap-4 pb-6 border-b border-white/20">
+                    <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-rose-700 rounded-2xl flex items-center justify-center shadow-xl">
+                      <CheckCircleIcon className="h-9 w-9 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-white font-bold text-lg">Verified Platform</h3>
-                      <p className="text-gray-300 text-sm">100% Transparent Data</p>
+                      <h3 className="text-white font-bold text-2xl">Verified Platform</h3>
+                      <p className="text-red-200 text-sm font-medium">100% Transparent Data</p>
                     </div>
                   </div>
                   
-                  <div className="border-t border-white/20 pt-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-amber-300 text-2xl font-bold">157</p>
-                        <p className="text-gray-200 text-xs">Total Schemes</p>
-                      </div>
-                      <div>
-                        <p className="text-amber-300 text-2xl font-bold">95.5Cr</p>
-                        <p className="text-gray-200 text-xs">Beneficiaries</p>
-                      </div>
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+                      <p className="text-red-300 text-3xl font-black mb-1">157</p>
+                      <p className="text-gray-200 text-xs font-semibold">Total Schemes</p>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+                      <p className="text-teal-300 text-3xl font-black mb-1">95.5Cr</p>
+                      <p className="text-gray-200 text-xs font-semibold">Beneficiaries</p>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+                      <p className="text-red-300 text-3xl font-black mb-1">₹15.4L Cr</p>
+                      <p className="text-gray-200 text-xs font-semibold">Budget Tracked</p>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+                      <p className="text-teal-300 text-3xl font-black mb-1">82%</p>
+                      <p className="text-gray-200 text-xs font-semibold">Transparency</p>
                     </div>
                   </div>
                   
-                  <div className="border-t border-white/20 pt-4">
-                    <p className="text-gray-100 text-sm italic">
-                      "Transparency is the foundation of democracy"
+                  {/* Quote */}
+                  <div className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+                    <p className="text-gray-100 text-sm italic leading-relaxed">
+                      "Transparency is the foundation of democracy and good governance"
                     </p>
+                    <p className="text-red-300 text-xs font-semibold mt-2">— Indian Constitution</p>
                   </div>
                 </div>
               </div>
-              {/* Decorative glow effects */}
-              <div className="absolute top-0 -right-4 w-40 h-40 bg-amber-400/30 rounded-full filter blur-3xl"></div>
-              <div className="absolute bottom-0 -left-4 w-40 h-40 bg-blue-400/30 rounded-full filter blur-3xl"></div>
+              
+              {/* Floating elements for depth - Parliament colors */}
+              <div className="absolute -top-8 -right-8 w-32 h-32 bg-red-500/20 rounded-full filter blur-3xl animate-pulse"></div>
+              <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-teal-600/20 rounded-full filter blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-white dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              How Jhol Khol Works
+      {/* Features Section with Glass Morphism */}
+      <section className="py-32 relative overflow-hidden">
+        {/* Background Pattern - Parliament Theme */}
+        <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 backdrop-blur-3xl"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(220,38,38,0.1),transparent_70%)]"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Section Header */}
+          <div className="text-center mb-20">
+            <div className="inline-block px-6 py-2 bg-gradient-to-r from-red-600/20 to-teal-600/20 backdrop-blur-xl rounded-full border border-red-600/30 mb-6">
+              <span className="text-red-800 dark:text-red-300 font-bold text-sm">HOW IT WORKS</span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-black text-gray-900 dark:text-white mb-6">
+              Four Powerful Tools
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              Four powerful tools for transparent governance
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              For transparent governance and accountability
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Features Grid with Glass Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <div 
                 key={index}
-                className="group p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                className="group relative bg-white/60 dark:bg-gray-800/60 backdrop-blur-2xl rounded-3xl p-8 border border-gray-200/50 dark:border-gray-700/50 hover:border-red-600/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-red-600/20"
               >
-                <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <feature.icon className="h-7 w-7 text-white" />
+                {/* Gradient overlay on hover - Parliament colors */}
+                <div className="absolute inset-0 bg-gradient-to-br from-red-600/0 to-teal-600/0 group-hover:from-red-600/10 group-hover:to-teal-600/10 rounded-3xl transition-all duration-500"></div>
+                
+                <div className="relative">
+                  {/* Icon */}
+                  <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-rose-700 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg">
+                    <feature.icon className="h-8 w-8 text-white" />
+                  </div>
+                  
+                  {/* Content */}
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {feature.description}
-                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Impact Section */}
-      <section className="py-20 bg-gradient-to-br from-blue-600 to-purple-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Our Impact</h2>
-            <p className="text-xl text-blue-100">Making a difference in governance transparency</p>
+      {/* Impact Section with Modern Glass Design */}
+      <section className="relative py-32 overflow-hidden">
+        {/* Animated Background - Parliament Red Sandstone Theme */}
+        <div className="absolute inset-0 bg-gradient-to-br from-red-700 via-rose-700 to-stone-800"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.3),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(17,94,89,0.3),transparent_50%)]"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-6xl font-black text-white mb-4">Our Impact</h2>
+            <p className="text-xl text-red-100">Making a difference in governance transparency</p>
           </div>
 
           {stats && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              <div className="text-center">
-                <div className="text-5xl font-bold mb-2">{stats.totalSchemes}</div>
-                <div className="text-blue-100">Total Schemes Tracked</div>
-              </div>
-              <div className="text-center">
-                <div className="text-5xl font-bold mb-2">{stats.budgetAllocated}</div>
-                <div className="text-blue-100">Budget Monitored</div>
-              </div>
-              <div className="text-center">
-                <div className="text-5xl font-bold mb-2">{stats.beneficiaries}</div>
-                <div className="text-blue-100">Lives Impacted</div>
-              </div>
-              <div className="text-center">
-                <div className="text-5xl font-bold mb-2">{stats.transparencyScore}%</div>
-                <div className="text-blue-100">Transparency Score</div>
-              </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[
+                { value: stats.totalSchemes, label: "Total Schemes Tracked", icon: "📊" },
+                { value: stats.budgetAllocated, label: "Budget Monitored", icon: "💰" },
+                { value: stats.beneficiaries, label: "Lives Impacted", icon: "👥" },
+                { value: `${stats.transparencyScore}%`, label: "Transparency Score", icon: "⚖️" }
+              ].map((stat, index) => (
+                <div 
+                  key={index}
+                  className="group relative bg-white/10 backdrop-blur-2xl border border-white/30 rounded-3xl p-8 hover:bg-white/20 hover:scale-105 transition-all duration-500 shadow-2xl"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/0 to-white/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative text-center">
+                    <div className="text-4xl mb-4">{stat.icon}</div>
+                    <div className="text-5xl font-black text-white mb-3">{stat.value}</div>
+                    <div className="text-red-100 font-semibold">{stat.label}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-white dark:bg-gray-900">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
-            Ready to Make a Difference?
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
-            Join thousands of citizens working towards a transparent and accountable government.
-          </p>
-          <Link 
-            href="/dashboard"
-            className="inline-flex items-center justify-center px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg rounded-full font-semibold hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
-          >
-            Get Started Now
-            <ArrowRightIcon className="ml-3 h-6 w-6" />
-          </Link>
+      {/* CTA Section with Glass Morphism */}
+      <section className="relative py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-stone-100 to-red-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"></div>
+        
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="relative bg-white/70 dark:bg-gray-800/70 backdrop-blur-3xl rounded-[3rem] p-16 border border-gray-200/50 dark:border-gray-700/50 shadow-2xl text-center">
+            {/* Decorative elements - Parliament colors */}
+            <div className="absolute -top-12 -right-12 w-48 h-48 bg-red-500/30 rounded-full filter blur-3xl"></div>
+            <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-teal-600/30 rounded-full filter blur-3xl"></div>
+            
+            <div className="relative">
+              <h2 className="text-5xl md:text-6xl font-black text-gray-900 dark:text-white mb-6">
+                Ready to Make a Difference?
+              </h2>
+              <p className="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto">
+                Join thousands of citizens working towards a transparent and accountable government.
+              </p>
+              <Link 
+                href="/dashboard"
+                className="group inline-flex items-center justify-center px-12 py-5 bg-gradient-to-r from-red-600 to-rose-700 text-white text-lg rounded-2xl font-bold hover:shadow-2xl hover:shadow-red-600/50 transition-all duration-300 transform hover:scale-105"
+              >
+                <span className="mr-3">Get Started Now</span>
+                <ArrowRightIcon className="h-6 w-6 group-hover:translate-x-2 transition-transform" />
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
