@@ -1,6 +1,5 @@
 /secrets
 /.github
-/backend
 
 # Environment variables and secrets
 .env
