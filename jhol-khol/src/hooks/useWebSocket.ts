@@ -16,77 +16,100 @@ interface UseWebSocketReturn {
   lastAlert: AnomalyAlert | null;
 }
 
+const MAX_RETRIES = 5;
+const BASE_DELAY_MS = 3000;
+
+function confidenceToSeverity(score: number): AnomalyAlert['severity'] {
+  if (score >= 0.9) return 'CRITICAL';
+  if (score >= 0.75) return 'HIGH';
+  if (score >= 0.5) return 'MEDIUM';
+  return 'LOW';
+}
+
 export function useWebSocket(url: string): UseWebSocketReturn {
   const ws = useRef<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
   const [alerts, setAlerts] = useState<AnomalyAlert[]>([]);
   const [lastAlert, setLastAlert] = useState<AnomalyAlert | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const retryCountRef = useRef(0);
+  const unmountedRef = useRef(false);
 
   useEffect(() => {
+    unmountedRef.current = false;
+
     const connect = () => {
+      if (unmountedRef.current) return;
+
       try {
-        console.log(`[WebSocket] Connecting to ${url}...`);
         ws.current = new WebSocket(url);
 
         ws.current.onopen = () => {
-          console.log('[WebSocket] Connected');
+          if (unmountedRef.current) return;
+          retryCountRef.current = 0;
           setConnected(true);
         };
 
         ws.current.onmessage = (event) => {
+          if (unmountedRef.current) return;
           try {
-            const data = JSON.parse(event.data);
-            console.log('[WebSocket] Received:', data);
-            
+            const envelope = JSON.parse(event.data);
+            // Backend sends { type: 'new_anomaly', data: { alert_id, alert_type, ... } }
+            const raw = (envelope?.data ?? envelope) as Record<string, unknown>;
+
+            const confidence = parseFloat(String(raw.confidence_score ?? 0));
             const alert: AnomalyAlert = {
-              id: data.id || `alert-${Date.now()}`,
-              timestamp: data.timestamp || new Date().toISOString(),
-              department: data.department || 'Unknown',
-              type: data.type || 'ANOMALY',
-              severity: data.severity || 'MEDIUM',
-              amount: data.amount || 0,
-              description: data.description || data.message || 'Anomaly detected',
+              id: String(raw.alert_id ?? raw.id ?? `alert-${Date.now()}`),
+              timestamp: String(raw.timestamp ?? new Date().toISOString()),
+              department: String(raw.dept_id ?? raw.department ?? 'Unknown'),
+              type: String(raw.alert_type ?? raw.type ?? 'ANOMALY'),
+              severity: (raw.severity as AnomalyAlert['severity']) ?? confidenceToSeverity(confidence),
+              amount: Number(raw.amount ?? raw.flagged_amount ?? 0),
+              description: String(raw.description ?? raw.message ?? 'Anomaly detected'),
             };
 
             setLastAlert(alert);
-            setAlerts((prev) => [alert, ...prev].slice(0, 50)); // Keep last 50 alerts
-          } catch (error) {
-            console.error('[WebSocket] Error parsing message:', error);
+            setAlerts((prev) => [alert, ...prev].slice(0, 50));
+          } catch (err) {
+            console.error('[WebSocket] Failed to parse message:', err);
           }
         };
 
-        ws.current.onerror = (error) => {
-          console.error('[WebSocket] Error:', error);
+        ws.current.onerror = () => {
+          // Browser WebSocket error events carry no useful detail; the close
+          // event (which always follows) has the code/reason.
+          if (retryCountRef.current === 0) {
+            console.warn(`[WebSocket] Connection to ${url} failed — will retry (max ${MAX_RETRIES})`);
+          }
         };
 
-        ws.current.onclose = () => {
-          console.log('[WebSocket] Disconnected');
+        ws.current.onclose = (event) => {
+          if (unmountedRef.current) return;
           setConnected(false);
-          
-          // Attempt to reconnect after 5 seconds
-          reconnectTimeoutRef.current = setTimeout(() => {
-            console.log('[WebSocket] Attempting to reconnect...');
-            connect();
-          }, 5000);
+
+          if (retryCountRef.current >= MAX_RETRIES) {
+            console.warn(`[WebSocket] Gave up after ${MAX_RETRIES} retries.`);
+            return;
+          }
+
+          const delay = BASE_DELAY_MS * 2 ** retryCountRef.current;
+          retryCountRef.current += 1;
+          reconnectTimeoutRef.current = setTimeout(connect, delay);
         };
-      } catch (error) {
-        console.error('[WebSocket] Connection error:', error);
-        setConnected(false);
+      } catch (err) {
+        console.error('[WebSocket] Failed to create connection:', err);
       }
     };
 
     connect();
 
     return () => {
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
-      if (ws.current) {
-        ws.current.close();
-      }
+      unmountedRef.current = true;
+      clearTimeout(reconnectTimeoutRef.current);
+      ws.current?.close();
     };
   }, [url]);
 
   return { connected, alerts, lastAlert };
 }
+
