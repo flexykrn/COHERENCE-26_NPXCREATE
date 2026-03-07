@@ -24,7 +24,7 @@ export default function SchemeAnomaliesPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.getSchemeAnomalies({ limit: 50 });
+      const response = await apiClient.getSchemesAnomalies();
       setData(response);
     } catch (error) {
       console.error('Failed to fetch scheme anomalies:', error);
