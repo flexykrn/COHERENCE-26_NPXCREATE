@@ -6,6 +6,9 @@
     "deploy": "hardhat run scripts/deploy.js",
     "deploy:testnet": "hardhat run scripts/deploy.js --network hoodiTestnet",
     "deploy:mainnet": "hardhat run scripts/deploy.js --network hoodiMainnet",
+    "deploy:govtech": "hardhat run scripts/deploy-govtech-suite.js",
+    "deploy:govtech:testnet": "hardhat run scripts/deploy-govtech-suite.js --network hoodiTestnet",
+    "deploy:govtech:mainnet": "hardhat run scripts/deploy-govtech-suite.js --network hoodiMainnet",
     "submit-batch": "hardhat run scripts/submit-batch.js",
     "submit-batch:testnet": "hardhat run scripts/submit-batch.js --network hoodiTestnet",
     "submit-batch:mainnet": "hardhat run scripts/submit-batch.js --network hoodiMainnet",
@@ -33,6 +36,7 @@
     "hardhat": "^2.19.0"
   },
   "dependencies": {
+    "@chainlink/contracts": "^1.4.0",
     "@openzeppelin/contracts": "^5.0.0",
     "dotenv": "^16.3.1",
     "node-fetch": "^2.7.0"

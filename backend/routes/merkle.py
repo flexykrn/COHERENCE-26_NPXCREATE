@@ -23,7 +23,7 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '../../.env'))
 HOODI_RPC_URL = os.getenv("HOODI_RPC_URL", "https://ethereum-hoodi-rpc.publicnode.com")
 HOODI_CHAIN_ID = int(os.getenv("HOODI_CHAIN_ID", "560048"))
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
-REGISTRY_ADDRESS = "0x44880567cA570a3F3F1D3deBCD76eE04279F68b4"
+REGISTRY_ADDRESS = "0x32d7396F1b808Da0deB2addAd547d390463faC2A"
 
 # Minimal ABI — only the function we call
 REGISTRY_ABI = [

@@ -18,6 +18,7 @@ from collections import defaultdict
 from math import log, sqrt
 from datetime import datetime
 from typing import Optional
+from .anomaly_actions import generate_action, batch_generate_actions, get_action_summary
 
 router = APIRouter()
 DATA = {}   # injected by main.py
@@ -399,4 +400,79 @@ def get_scan_results(
             "6. Cross-Ministry Vendor Contamination Graph (3+ ministries)",
         ],
         "data": detected,
+    }
+
+
+@router.get("/anomalies/scan-with-actions")
+def get_scan_with_actions(
+    alert_type: Optional[str] = Query(None, description="Filter by alert type"),
+    severity:   Optional[str] = Query(None, description="HIGH | MEDIUM | LOW"),
+):
+    """
+    Enhanced anomaly scan that includes actionable recommendations.
+    For each anomaly, generates:
+    - Recommended action
+    - Priority level
+    - Required steps
+    - Responsible authority
+    - Deadline
+    """
+    # Run detection
+    detected = run_scan()
+
+    if alert_type:
+        detected = [d for d in detected if d["alert_type"] == alert_type]
+    if severity:
+        detected = [d for d in detected if d["severity"] == severity.upper()]
+
+    detected.sort(key=lambda x: x["confidence_score"], reverse=True)
+
+    # Generate actions for each anomaly
+    actions = batch_generate_actions(detected)
+    action_summary = get_action_summary(actions)
+    
+    # Merge anomalies with their actions
+    enriched_data = []
+    for anomaly, action in zip(detected, actions):
+        enriched_data.append({
+            **anomaly,
+            "action": {
+                "action_id": action.action_id,
+                "priority": action.priority,
+                "category": action.category,
+                "title": action.action_title,
+                "description": action.action_description,
+                "steps": action.required_steps,
+                "documents": action.required_documents,
+                "authority": action.responsible_authority,
+                "deadline": action.deadline,
+                "estimated_recovery_cr": action.estimated_recovery_cr,
+            }
+        })
+
+    type_counts     = defaultdict(int)
+    severity_counts = {"HIGH": 0, "MEDIUM": 0, "LOW": 0}
+    total_amount    = 0.0
+    for d in detected:
+        type_counts[d["alert_type"]] += 1
+        sev = d.get("severity", "LOW")
+        severity_counts[sev] = severity_counts.get(sev, 0) + 1
+        if d.get("amount_cr"):
+            total_amount += d["amount_cr"]
+
+    return {
+        "total_detected":          len(detected),
+        "total_amount_flagged_cr": round(total_amount, 2),
+        "severity_counts":         severity_counts,
+        "type_counts":             dict(type_counts),
+        "action_workflow": action_summary,
+        "algorithms_used": [
+            "1. Z-Score per DDO (threshold: 2.5σ above DDO own mean)",
+            "2. Duplicate Sliding Window (same DDO+vendor+amount within 7 days)",
+            "3. Shannon Entropy — Vendor Diversity (normalised entropy < 0.80)",
+            "4. Q4 Acceleration Ratio (Q4 daily rate > 2.5× Q1-Q3 baseline)",
+            "5. Month-over-Month Velocity Deceleration (early lapse warning)",
+            "6. Cross-Ministry Vendor Contamination Graph (3+ ministries)",
+        ],
+        "data": enriched_data,
     }
