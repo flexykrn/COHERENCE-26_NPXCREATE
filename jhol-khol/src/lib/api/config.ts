@@ -51,6 +51,10 @@ export const API_CONFIG = {
     BUDGET_SCHEMES_OVERVIEW: '/api/budget/schemes',
     BUDGET_NATIONAL_STATS: '/api/budget/national-stats',
     
+    // Vendors
+    VENDORS: '/api/vendors',
+    VENDORS_CATEGORIES: '/api/vendors/categories',
+    
     // WebSocket
     LIVE_FEED: '/ws/live-feed',
   },

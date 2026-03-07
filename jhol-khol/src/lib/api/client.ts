@@ -228,6 +228,17 @@ export const apiClient = {
   async getBudgetNationalStats(): Promise<BudgetNationalStats> {
     return fetchApi<BudgetNationalStats>(API_CONFIG.ENDPOINTS.BUDGET_NATIONAL_STATS);
   },
+
+  // ── Vendors ───────────────────────────────────────────────────────────────
+  
+  async getVendors(params?: { category?: string; limit?: number }): Promise<any> {
+    const queryString = buildQueryString(params);
+    return fetchApi<any>(`${API_CONFIG.ENDPOINTS.VENDORS}${queryString}`);
+  },
+
+  async getVendorCategories(): Promise<any> {
+    return fetchApi<any>(API_CONFIG.ENDPOINTS.VENDORS_CATEGORIES);
+  },
 };
 
 // ============================================================================

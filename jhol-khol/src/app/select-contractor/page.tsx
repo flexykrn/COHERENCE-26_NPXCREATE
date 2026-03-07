@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
+import { apiClient } from '@/lib/api';
 import {
   UserGroupIcon,
   ShieldCheckIcon,
@@ -16,95 +17,49 @@ import {
   SparklesIcon,
 } from '@heroicons/react/24/outline';
 
-// Sample contractors with AI risk scores
-const contractors = [
-  {
-    id: 1,
-    name: 'Reliable Builders Pvt Ltd',
-    riskScore: 25,
-    completionRate: 95,
-    qualityScore: 92,
-    activeProjects: 5,
-    pastProjects: 48,
-    avgDelay: 2,
-    litigationCount: 0,
-    financialStability: 0.95,
-    costOverrunPct: 5,
-  },
-  {
-    id: 2,
-    name: 'Excel Infrastructure',
-    riskScore: 32,
-    completionRate: 91,
-    qualityScore: 88,
-    activeProjects: 7,
-    pastProjects: 35,
-    avgDelay: 5,
-    litigationCount: 1,
-    financialStability: 0.90,
-    costOverrunPct: 8,
-  },
-  {
-    id: 3,
-    name: 'Modern Constructions Ltd',
-    riskScore: 45,
-    completionRate: 85,
-    qualityScore: 82,
-    activeProjects: 4,
-    pastProjects: 28,
-    avgDelay: 8,
-    litigationCount: 2,
-    financialStability: 0.85,
-    costOverrunPct: 12,
-  },
-  {
-    id: 4,
-    name: 'Budget Contractors Co',
-    riskScore: 58,
-    completionRate: 78,
-    qualityScore: 75,
-    activeProjects: 6,
-    pastProjects: 22,
-    avgDelay: 12,
-    litigationCount: 3,
-    financialStability: 0.78,
-    costOverrunPct: 18,
-  },
-  {
-    id: 5,
-    name: 'QuickBuild Services',
-    riskScore: 68,
-    completionRate: 72,
-    qualityScore: 70,
-    activeProjects: 8,
-    pastProjects: 18,
-    avgDelay: 18,
-    litigationCount: 4,
-    financialStability: 0.70,
-    costOverrunPct: 25,
-  },
-  {
-    id: 6,
-    name: 'Shady Contractors Inc',
-    riskScore: 85,
-    completionRate: 60,
-    qualityScore: 58,
-    activeProjects: 3,
-    pastProjects: 15,
-    avgDelay: 25,
-    litigationCount: 7,
-    financialStability: 0.55,
-    costOverrunPct: 40,
-  },
-];
-
 export default function SelectContractorPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [department, setDepartment] = useState<any>(null);
+  const [contractors, setContractors] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedContractor, setSelectedContractor] = useState<number | null>(null);
   const [showWarning, setShowWarning] = useState(false);
   const [justification, setJustification] = useState('');
+
+  useEffect(() => {
+    // Check authentication
+    const userData = localStorage.getItem('user');
+    const deptData = localStorage.getItem('selectedDepartment');
+    
+    if (!userData || !deptData) {
+      router.push('/login');
+      return;
+    }
+    
+    setUser(JSON.parse(userData));
+    setDepartment(JSON.parse(deptData));
+    
+    // Fetch contractors from API
+    loadContractors();
+  }, [router]);
+
+  const loadContractors = async () => {
+    try {
+      setLoading(true);
+      const response = await apiClient.getVendors({ 
+        category: 'Construction',  // Can be filtered based on department
+        limit: 20 
+      });
+      setContractors(response.contractors || []);
+    } catch (error) {
+      console.error('Failed to load contractors:', error);
+      // Fallback to empty array
+      setContractors([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Check authentication
@@ -179,10 +134,13 @@ export default function SelectContractorPage() {
     .sort((a, b) => a.riskScore - b.riskScore)
     .slice(0, 3);
 
-  if (!user || !department) {
+  if (!user || !department || loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+          <p className="text-gray-400">Loading contractors...</p>
+        </div>
       </div>
     );
   }
@@ -260,8 +218,14 @@ export default function SelectContractorPage() {
 
           {/* Contractors List */}
           <div className="lg:col-span-2">
-            <div className="space-y-4">
-              {contractors.map((contractor, index) => {
+            {contractors.length === 0 ? (
+              <div className="bg-white/10 border border-white/20 rounded-2xl p-12 text-center">
+                <p className="text-gray-400 text-lg mb-2">No contractors available</p>
+                <p className="text-gray-500 text-sm">Try adjusting the filters or check back later</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {contractors.map((contractor, index) => {
                 const badge = getRiskBadge(contractor.riskScore);
                 
                 return (
@@ -385,6 +349,7 @@ export default function SelectContractorPage() {
                 );
               })}
             </div>
+            )}
           </div>
         </div>
       </div>
