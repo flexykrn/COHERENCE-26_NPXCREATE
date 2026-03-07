@@ -138,13 +138,13 @@ export default function SchemesPage() {
                     <div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">Budget Allocated</div>
                       <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                        ₹{scheme.total_allocated_cr.toFixed(2)} Cr
+                        ₹{(scheme.total_allocated_cr || 0).toFixed(2)} Cr
                       </div>
                     </div>
                     <div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">Budget Utilized</div>
                       <div className="text-lg font-semibold text-purple-600 dark:text-purple-400">
-                        ₹{scheme.total_utilized_cr.toFixed(2)} Cr
+                        ₹{(scheme.total_utilized_cr || 0).toFixed(2)} Cr
                       </div>
                     </div>
                   </div>
@@ -153,13 +153,13 @@ export default function SchemesPage() {
                     <div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">Target Beneficiaries</div>
                       <div className="text-lg font-semibold text-amber-600 dark:text-amber-400">
-                        {scheme.beneficiaries_target.toLocaleString('en-IN')}
+                        {(scheme.beneficiaries_target || 0).toLocaleString('en-IN')}
                       </div>
                     </div>
                     <div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">Reached</div>
                       <div className="text-lg font-semibold text-green-600 dark:text-green-400">
-                        {scheme.beneficiaries_reached.toLocaleString('en-IN')}
+                        {(scheme.beneficiaries_reached || 0).toLocaleString('en-IN')}
                       </div>
                     </div>
                   </div>
@@ -168,13 +168,13 @@ export default function SchemesPage() {
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm text-gray-600 dark:text-gray-400">Budget Utilization</span>
                       <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {scheme.utilization_pct.toFixed(1)}%
+                        {(scheme.utilization_pct || 0).toFixed(1)}%
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div 
-                        className={`h-2 rounded-full ${getStatusColor(scheme.utilization_pct)}`}
-                        style={{ width: `${Math.min(100, scheme.utilization_pct)}%` }}
+                        className={`h-2 rounded-full ${getStatusColor(scheme.utilization_pct || 0)}`}
+                        style={{ width: `${Math.min(100, scheme.utilization_pct || 0)}%` }}
                       ></div>
                     </div>
                   </div>
@@ -183,13 +183,13 @@ export default function SchemesPage() {
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm text-gray-600 dark:text-gray-400">Coverage</span>
                       <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {scheme.coverage_pct.toFixed(1)}%
+                        {(scheme.coverage_pct || 0).toFixed(1)}%
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div 
-                        className={`h-2 rounded-full ${getStatusColor(scheme.coverage_pct)}`}
-                        style={{ width: `${Math.min(100, scheme.coverage_pct)}%` }}
+                        className={`h-2 rounded-full ${getStatusColor(scheme.coverage_pct || 0)}`}
+                        style={{ width: `${Math.min(100, scheme.coverage_pct || 0)}%` }}
                       ></div>
                     </div>
                   </div>
@@ -200,9 +200,9 @@ export default function SchemesPage() {
                         Unspent Amount
                       </span>
                       <span className={`font-semibold ${
-                        scheme.unspent_amount_cr > 10 ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'
+                        (scheme.unspent_amount_cr || 0) > 10 ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'
                       }`}>
-                        ₹{scheme.unspent_amount_cr.toFixed(2)} Cr
+                        ₹{(scheme.unspent_amount_cr || 0).toFixed(2)} Cr
                       </span>
                     </div>
                   </div>
