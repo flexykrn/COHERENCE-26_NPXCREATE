@@ -4,32 +4,35 @@ import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
+import apiClient from '@/lib/api/client';
+import type { WelfareScheme } from '@/lib/api/types';
 
 export default function SchemesPage() {
-  const [schemes, setSchemes] = useState<any[]>([]);
+  const [schemes, setSchemes] = useState<WelfareScheme[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    fetch('/api/schemes')
-      .then(res => res.json())
-      .then(data => {
-        // Ensure we always set an array
-        setSchemes(Array.isArray(data.data) ? data.data : []);
-        setLoading(false);
-      })
-      .catch(err => {
+    const fetchSchemes = async () => {
+      setLoading(true);
+      try {
+        const data = await apiClient.getSchemes();
+        setSchemes(data.schemes || []);
+      } catch (err) {
         console.error('Failed to fetch schemes:', err);
         setSchemes([]);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    
+    fetchSchemes();
   }, []);
 
   const filteredSchemes = (schemes || []).filter(scheme => {
-    const matchesSearch = scheme.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         scheme.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = scheme.scheme_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         scheme.department.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'All' || scheme.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
@@ -80,7 +83,7 @@ export default function SchemesPage() {
                   <option>All</option>
                   <option>Active</option>
                   <option>Completed</option>
-                  <option>Pending</option>
+                  <option>Paused</option>
                 </select>
               </div>
             </div>
@@ -110,49 +113,83 @@ export default function SchemesPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredSchemes.map((scheme) => (
               <div 
-                key={scheme.id}
+                key={scheme.scheme_id}
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden"
               >
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                      {scheme.title}
+                      {scheme.scheme_name}
                     </h3>
-                    <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full text-sm font-semibold">
+                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                      scheme.status === 'Active' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
+                      scheme.status === 'Completed' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' :
+                      'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
+                    }`}>
                       {scheme.status}
                     </span>
                   </div>
                   
                   <p className="text-gray-600 dark:text-gray-400 mb-4">
-                    {scheme.description}
+                    Department: {scheme.department}
                   </p>
                   
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">Budget</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">Budget Allocated</div>
                       <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                        {scheme.budget}
+                        ₹{scheme.total_allocated_cr.toFixed(2)} Cr
                       </div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">Beneficiaries</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">Budget Utilized</div>
                       <div className="text-lg font-semibold text-purple-600 dark:text-purple-400">
-                        {scheme.beneficiaries}
+                        ₹{scheme.total_utilized_cr.toFixed(2)} Cr
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">Target Beneficiaries</div>
+                      <div className="text-lg font-semibold text-amber-600 dark:text-amber-400">
+                        {scheme.beneficiaries_target.toLocaleString('en-IN')}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">Reached</div>
+                      <div className="text-lg font-semibold text-green-600 dark:text-green-400">
+                        {scheme.beneficiaries_reached.toLocaleString('en-IN')}
                       </div>
                     </div>
                   </div>
                   
-                  <div>
+                  <div className="mb-3">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Progress</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Budget Utilization</span>
                       <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {scheme.completionRate}%
+                        {scheme.utilization_pct.toFixed(1)}%
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div 
-                        className={`h-2 rounded-full ${getStatusColor(scheme.completionRate)}`}
-                        style={{ width: `${scheme.completionRate}%` }}
+                        className={`h-2 rounded-full ${getStatusColor(scheme.utilization_pct)}`}
+                        style={{ width: `${Math.min(100, scheme.utilization_pct)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Coverage</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                        {scheme.coverage_pct.toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full ${getStatusColor(scheme.coverage_pct)}`}
+                        style={{ width: `${Math.min(100, scheme.coverage_pct)}%` }}
                       ></div>
                     </div>
                   </div>
@@ -160,10 +197,12 @@ export default function SchemesPage() {
                   <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500 dark:text-gray-400">
-                        {scheme.department}
+                        Unspent Amount
                       </span>
-                      <span className="text-gray-500 dark:text-gray-400">
-                        Since {new Date(scheme.launchDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short' })}
+                      <span className={`font-semibold ${
+                        scheme.unspent_amount_cr > 10 ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'
+                      }`}>
+                        ₹{scheme.unspent_amount_cr.toFixed(2)} Cr
                       </span>
                     </div>
                   </div>
