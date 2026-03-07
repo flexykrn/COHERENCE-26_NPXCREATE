@@ -6,8 +6,11 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x" + "0".repeat(64);
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
-    version: "0.8.24",
-    settings: { optimizer: { enabled: true, runs: 200 } },
+    version: "0.8.26",
+    settings: {
+      optimizer: { enabled: true, runs: 200 },
+      evmVersion: "cancun",
+    },
   },
   networks: {
     hoodi: {
