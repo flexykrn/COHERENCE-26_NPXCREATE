@@ -43,16 +43,16 @@ export function LiveAlertsProvider({ children }: { children: React.ReactNode }) 
       setAlerts((prev) => [newAlert, ...prev].slice(0, 50)); // Keep last 50 alerts
       setUnreadCount((prev) => prev + 1);
 
-      // Play sound for high severity alerts
-      if (lastAlert.severity === 'CRITICAL' || lastAlert.severity === 'HIGH') {
-        try {
-          const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwPUKXh8LVhHQU2kdXyzn0vBSR2yO/ekjsKE160UvOoVRULRp/i8r1rIAUshc3y2Ig1BxpmvvDknE4MD1Ck4vC1YR0FNpHV8s5+LwUkdsjv3pI7ChNetFLzqFUVC0af4vK9aiAFLIXN8tiINQcaZr7w5JxODA9QpOLwtWEdBTaR1fLOfi8FJHbI796SOwsVXrRS86hVFAtGn+Lyu2ogBSyFzvLYhzYHGma+8OSbTgwPUKLh8LVhHQU2kdXyzn4vBSR2x+/ekjsLFV600vOoVRQLRp/i8rtrIAUshs7y2Ic2BxpmvvHkmk4MD1Ch4PC1YBwFNpHU8s59LgUjd8fv3pI7CxVftFLzqFUVC0af4vK7ayAFLIbO8tiHNgcZZr3w5JpODA9QoeDwtWAdBTaR1PLPfS4FI3fH792SOwsVXrRS86hVFQtGnuHyvGogBSyGzvLYhzYHGWa98OOZTgwPUKHg8LRgHAU2kdTyz30uBSN3x+/dkjoMFV600vOoVBQLRZ7i8rtoHwUshc7y2Ig2Bxpmv/DjmU4MD06h4O+0YRwENpHU8s9+LwUjdsjv3ZI6DBVftNLzp1QUC0We4vK6aB8FLIbO8tiHNgcZZr7w45hOCw9OoODwtGEdBTaR1PLPfi8FI3bH79yROgwVXrXR86dUFAtEnuLydGkfBSyGzvLYhzYHGWa98OOYTggOTqDg8LNgHAU1kdXyz30uBSJ1yO/dkjoMFV610PSmUxULQ57h8rtnGwUshs/z2Ig2Bxlmvf'); 
-          audio.volume = 0.3;
-          audio.play().catch(() => {});
-        } catch (error) {
-          // Ignore audio errors
-        }
-      }
+      // Sound notifications disabled
+      // if (lastAlert.severity === 'CRITICAL' || lastAlert.severity === 'HIGH') {
+      //   try {
+      //     const audio = new Audio('data:audio/wav;base64,...'); 
+      //     audio.volume = 0.3;
+      //     audio.play().catch(() => {});
+      //   } catch (error) {
+      //     // Ignore audio errors
+      //   }
+      // }
     }
   }, [lastAlert]);
 
