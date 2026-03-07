@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/lib/api';
-import type { LapseRiskResponse, LapseRiskDepartment } from '@/lib/api/types';
+import type { LapseRiskResponse, LapseRisk as LapseRiskDepartment } from '@/lib/api/types';
+import Link from 'next/link';
 import {
   ExclamationTriangleIcon,
   ChartBarIcon,
@@ -31,10 +32,6 @@ export default function LapseRiskPage() {
       setLoading(false);
     }
   };
-
-  const filteredDepartments = data?.departments.filter(dept => 
-    filter === 'ALL' || dept.risk_level === filter
-  ) || [];
 
   const getRiskColor = (level: string) => {
     switch (level) {
@@ -70,10 +67,14 @@ export default function LapseRiskPage() {
     );
   }
 
-  const summary = data?.summary;
-  const highRiskCount = summary?.risk_breakdown.HIGH || 0;
-  const mediumRiskCount = summary?.risk_breakdown.MEDIUM || 0;
-  const lowRiskCount = summary?.risk_breakdown.LOW || 0;
+  const departments = data?.data ?? [];
+  const filteredDepartments = departments.filter(dept =>
+    filter === 'ALL' || dept.risk_level === filter
+  );
+  const highRiskCount = departments.filter(d => d.risk_level === 'HIGH').length;
+  const mediumRiskCount = departments.filter(d => d.risk_level === 'MEDIUM').length;
+  const lowRiskCount = departments.filter(d => d.risk_level === 'LOW').length;
+  const totalLapseAmount = departments.reduce((s, d) => s + d.lapse_amount_cr, 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
@@ -86,6 +87,20 @@ export default function LapseRiskPage() {
           <p className="text-gray-600 text-lg">
             ML-powered forecasting of fund underutilization and lapse risks
           </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/blockchain?tab=audit"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold rounded-xl shadow transition-colors"
+            >
+              🎲 Schedule VRF Audit for HIGH-Risk Depts
+            </Link>
+            <Link
+              href="/blockchain?tab=commitment"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-xl shadow transition-colors"
+            >
+              🔐 Anchor Lapse Report On-Chain
+            </Link>
+          </div>
         </div>
 
         {/* Summary Cards */}
@@ -98,7 +113,7 @@ export default function LapseRiskPage() {
               <div>
                 <p className="text-sm text-gray-500 font-medium">Total at Risk</p>
                 <p className="text-2xl font-black text-gray-900">
-                  {formatCurrency(summary?.total_lapse_amount || 0)}
+                  {formatCurrency(totalLapseAmount)}
                 </p>
               </div>
             </div>
@@ -192,7 +207,7 @@ export default function LapseRiskPage() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-bold text-gray-900">{dept.dept_name}</h3>
+                      <h3 className="text-xl font-bold text-gray-900">{dept.name}</h3>
                       <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getRiskColor(dept.risk_level)}`}>
                         {dept.risk_level} RISK
                       </span>
@@ -207,30 +222,30 @@ export default function LapseRiskPage() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                   <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
                     <p className="text-xs text-blue-700 font-semibold mb-1">Allocated</p>
-                    <p className="text-xl font-black text-blue-900">{formatCurrency(dept.allocated)}</p>
+                    <p className="text-xl font-black text-blue-900">{formatCurrency(dept.allocated_cr)}</p>
                   </div>
                   <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
                     <p className="text-xs text-green-700 font-semibold mb-1">Spent</p>
-                    <p className="text-xl font-black text-green-900">{formatCurrency(dept.spent)}</p>
+                    <p className="text-xl font-black text-green-900">{formatCurrency(dept.q1_q3_spent_cr)}</p>
                   </div>
                   <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
-                    <p className="text-xs text-purple-700 font-semibold mb-1">Projected End</p>
-                    <p className="text-xl font-black text-purple-900">{formatCurrency(dept.projected_end)}</p>
+                    <p className="text-xs text-purple-700 font-semibold mb-1">Projected Utilization</p>
+                    <p className="text-xl font-black text-purple-900">{dept.projected_utilization_pct.toFixed(1)}%</p>
                   </div>
                   <div className={`bg-gradient-to-br rounded-lg p-4 border ${
-                    dept.lapse_amount > 0 
+                    dept.lapse_amount_cr > 0 
                       ? 'from-red-50 to-red-100 border-red-200' 
                       : 'from-green-50 to-green-100 border-green-200'
                   }`}>
                     <p className={`text-xs font-semibold mb-1 ${
-                      dept.lapse_amount > 0 ? 'text-red-700' : 'text-green-700'
+                      dept.lapse_amount_cr > 0 ? 'text-red-700' : 'text-green-700'
                     }`}>
                       Lapse Amount
                     </p>
                     <p className={`text-xl font-black ${
-                      dept.lapse_amount > 0 ? 'text-red-900' : 'text-green-900'
+                      dept.lapse_amount_cr > 0 ? 'text-red-900' : 'text-green-900'
                     }`}>
-                      {dept.lapse_amount > 0 ? formatCurrency(dept.lapse_amount) : '₹0'}
+                      {dept.lapse_amount_cr > 0 ? formatCurrency(dept.lapse_amount_cr) : '₹0'}
                     </p>
                   </div>
                 </div>
@@ -240,7 +255,7 @@ export default function LapseRiskPage() {
                   <div className="flex justify-between mb-2">
                     <span className="text-sm font-semibold text-gray-700">Utilization Progress</span>
                     <span className="text-sm font-bold text-gray-900">
-                      {((dept.spent / dept.allocated) * 100).toFixed(1)}%
+                      {dept.projected_utilization_pct.toFixed(1)}%
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
@@ -252,7 +267,7 @@ export default function LapseRiskPage() {
                           ? 'bg-gradient-to-r from-yellow-400 to-orange-500'
                           : 'bg-gradient-to-r from-green-400 to-green-600'
                       }`}
-                      style={{ width: `${Math.min((dept.spent / dept.allocated) * 100, 100)}%` }}
+                      style={{ width: `${Math.min(dept.projected_utilization_pct, 100)}%` }}
                     ></div>
                   </div>
                 </div>
@@ -261,7 +276,7 @@ export default function LapseRiskPage() {
                 <div className="flex items-center gap-6 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <ClockIcon className="h-4 w-4" />
-                    <span>Days Remaining: <strong className="text-gray-900">{dept.days_remaining || 'N/A'}</strong></span>
+                    <span>Historical Avg: <strong className="text-gray-900">{dept.historical_avg_pct.toFixed(1)}%</strong></span>
                   </div>
                   <div className="flex items-center gap-2">
                     <ChartBarIcon className="h-4 w-4" />
