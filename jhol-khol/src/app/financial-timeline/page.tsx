@@ -117,6 +117,8 @@ export default function FinancialTimelinePage() {
   const [anomalyAlert, setAnomalyAlert] = useState<boolean>(false);
   const [anomalyDetails, setAnomalyDetails] = useState<string[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [showAnomalyPopup, setShowAnomalyPopup] = useState<boolean>(false);
+  const [quarterlyBudget, setQuarterlyBudget] = useState<{q1: number, q2: number, q3: number, q4: number}>({q1: 0, q2: 0, q3: 0, q4: 0});
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -142,6 +144,7 @@ export default function FinancialTimelinePage() {
     if (projects.length === 0) {
       setAnomalyAlert(false);
       setAnomalyDetails([]);
+      setShowAnomalyPopup(false);
       return;
     }
 
@@ -151,12 +154,27 @@ export default function FinancialTimelinePage() {
     const totalAllocated = projects.reduce((sum, p) => sum + p.allocated, 0);
     const totalSpent = projects.reduce((sum, p) => sum + p.spent, 0);
     
-    // 1. Year-end bunching detection (last 3 months)
-    const lastThreeMonths = projects.filter(p => p.startMonth >= 9);
-    const lastThreeAllocated = lastThreeMonths.reduce((sum, p) => sum + p.allocated, 0);
-    const yearEndRatio = lastThreeAllocated / totalAllocated;
+    // Calculate quarterly budget distribution
+    const q1Projects = projects.filter(p => p.startMonth >= 0 && p.startMonth <= 2); // Apr-Jun
+    const q2Projects = projects.filter(p => p.startMonth >= 3 && p.startMonth <= 5); // Jul-Sep
+    const q3Projects = projects.filter(p => p.startMonth >= 6 && p.startMonth <= 8); // Oct-Dec
+    const q4Projects = projects.filter(p => p.startMonth >= 9 && p.startMonth <= 11); // Jan-Mar
     
-    // 2. Rushed project detection (high budget + short duration in last quarter)
+    const q1Budget = q1Projects.reduce((sum, p) => sum + p.allocated, 0);
+    const q2Budget = q2Projects.reduce((sum, p) => sum + p.allocated, 0);
+    const q3Budget = q3Projects.reduce((sum, p) => sum + p.allocated, 0);
+    const q4Budget = q4Projects.reduce((sum, p) => sum + p.allocated, 0);
+    
+    setQuarterlyBudget({ q1: q1Budget, q2: q2Budget, q3: q3Budget, q4: q4Budget });
+    
+    // 1. Year-end bunching detection (Q3 + Q4)
+    const lastTwoQuarters = q3Budget + q4Budget;
+    const lastTwoQuartersRatio = totalAllocated > 0 ? lastTwoQuarters / totalAllocated : 0;
+    
+    // 2. Specific Q4 concentration check
+    const q4Ratio = totalAllocated > 0 ? q4Budget / totalAllocated : 0;
+    
+    // 3. Rushed project detection (high budget + short duration in last quarter)
     const rushedProjects = projects.filter(p => 
       p.startMonth >= 9 && 
       p.duration <= 2 && 
@@ -164,13 +182,14 @@ export default function FinancialTimelinePage() {
       p.status !== 'completed'
     );
     
-    // 3. Spending velocity anomaly (low spend rate for most of year, then spike)
+    // 4. Spending velocity anomaly (low spend rate for most of year, then spike)
     const firstNineMonths = projects.filter(p => p.startMonth < 9);
+    const lastThreeMonths = projects.filter(p => p.startMonth >= 9);
     const firstNineSpent = firstNineMonths.reduce((sum, p) => sum + p.spent, 0);
     const lastThreeSpent = lastThreeMonths.reduce((sum, p) => sum + p.spent, 0);
     const spendingRatio = totalSpent > 0 ? lastThreeSpent / totalSpent : 0;
     
-    // 4. Incomplete project bunching (multiple unfinished projects at year end)
+    // 5. Incomplete project bunching (multiple unfinished projects at year end)
     const incompleteLastQuarter = projects.filter(p => 
       p.startMonth >= 9 && 
       p.status !== 'completed' &&
@@ -178,36 +197,52 @@ export default function FinancialTimelinePage() {
     );
     
     // Check each anomaly and add details
-    const hasYearEndBunching = yearEndRatio > 0.45;
-    if (hasYearEndBunching) {
-      details.push(`${(yearEndRatio * 100).toFixed(1)}% of annual budget concentrated in final 3 months`);
+    const hasEndQuarterBunching = lastTwoQuartersRatio > 0.50; // More than 50% in Q3+Q4
+    const hasQ4Concentration = q4Ratio > 0.35; // More than 35% in Q4 alone
+    
+    if (hasEndQuarterBunching) {
+      details.push(`🚨 ${(lastTwoQuartersRatio * 100).toFixed(1)}% of annual budget concentrated in Q3 & Q4 (last 6 months)`);
+    }
+    
+    if (hasQ4Concentration) {
+      details.push(`⚠️ ${(q4Ratio * 100).toFixed(1)}% of budget rushed in Q4 (Jan-Mar) - final quarter`);
+      details.push(`Q4 Budget: ₹${q4Budget.toFixed(1)} Cr out of ₹${totalAllocated.toFixed(1)} Cr total`);
     }
     
     const hasRushedProjects = rushedProjects.length >= 2;
     if (hasRushedProjects) {
-      details.push(`${rushedProjects.length} high-value projects with unrealistic 2-month timelines in last quarter`);
+      details.push(`⏱️ ${rushedProjects.length} high-value projects with unrealistic 2-month timelines in Q4`);
+      rushedProjects.slice(0, 3).forEach(p => {
+        details.push(`   → ${p.name}: ₹${p.allocated} Cr in ${p.duration} months`);
+      });
     }
     
     const hasSpendingSpike = spendingRatio > 0.5 && totalSpent > 0;
     if (hasSpendingSpike) {
-      details.push(`${(spendingRatio * 100).toFixed(1)}% of total spending rushed in final quarter`);
+      details.push(`💸 ${(spendingRatio * 100).toFixed(1)}% of total spending rushed in final quarter`);
     }
     
-    const hasIncompleteProjects = incompleteLastQuarter.length >= 3;
+    const hasIncompleteProjects = incompleteLastQuarter.length >= 2;
     if (hasIncompleteProjects) {
-      details.push(`${incompleteLastQuarter.length} incomplete projects (< 50% spent) bunched at year-end`);
+      details.push(`📋 ${incompleteLastQuarter.length} incomplete projects (<50% spent) bunched at year-end`);
     }
     
     // Add general risk indicators
-    if (details.length > 0) {
-      details.push('Pattern matches known fund leakage strategies');
-      details.push('Risk of unspent funds being rushed without proper oversight');
+    if (hasEndQuarterBunching || hasQ4Concentration || hasRushedProjects) {
+      details.push('🔍 Pattern matches known fund leakage strategies');
+      details.push('⚡ Risk of unspent funds being rushed without proper oversight');
+      details.push('💡 Recommendation: Redistribute projects evenly across all quarters');
     }
     
-    const anomalyDetected = hasYearEndBunching || hasRushedProjects || hasSpendingSpike || hasIncompleteProjects;
+    const anomalyDetected = hasEndQuarterBunching || hasQ4Concentration || hasRushedProjects || hasSpendingSpike || hasIncompleteProjects;
     
     setAnomalyAlert(anomalyDetected);
     setAnomalyDetails(details);
+    
+    // Show popup if significant end-quarter bunching detected
+    if (anomalyDetected && (hasEndQuarterBunching || hasQ4Concentration)) {
+      setShowAnomalyPopup(true);
+    }
   };
 
   const handleDragStart = (projectId: string) => {
@@ -285,6 +320,58 @@ export default function FinancialTimelinePage() {
           </p>
         </motion.div>
 
+        {/* Quarterly Budget Distribution */}
+        {anomalyAlert && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-500 rounded-2xl p-6"
+          >
+            <h3 className="text-xl font-black text-purple-400 mb-4 flex items-center gap-2">
+              <ChartBarIcon className="w-6 h-6" />
+              Quarterly Budget Distribution
+            </h3>
+            <div className="grid grid-cols-4 gap-4">
+              <div className="bg-white/10 rounded-xl p-4">
+                <div className="text-sm text-gray-400 mb-1">Q1 (Apr-Jun)</div>
+                <div className="text-2xl font-black text-blue-400">₹{quarterlyBudget.q1.toFixed(1)} Cr</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {totalAllocated > 0 ? ((quarterlyBudget.q1 / totalAllocated) * 100).toFixed(1) : 0}% of total
+                </div>
+              </div>
+              <div className="bg-white/10 rounded-xl p-4">
+                <div className="text-sm text-gray-400 mb-1">Q2 (Jul-Sep)</div>
+                <div className="text-2xl font-black text-green-400">₹{quarterlyBudget.q2.toFixed(1)} Cr</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {totalAllocated > 0 ? ((quarterlyBudget.q2 / totalAllocated) * 100).toFixed(1) : 0}% of total
+                </div>
+              </div>
+              <div className={`rounded-xl p-4 ${
+                totalAllocated > 0 && (quarterlyBudget.q3 / totalAllocated) > 0.25
+                  ? 'bg-orange-500/30 border-2 border-orange-500'
+                  : 'bg-white/10'
+              }`}>
+                <div className="text-sm text-gray-400 mb-1">Q3 (Oct-Dec)</div>
+                <div className="text-2xl font-black text-orange-400">₹{quarterlyBudget.q3.toFixed(1)} Cr</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {totalAllocated > 0 ? ((quarterlyBudget.q3 / totalAllocated) * 100).toFixed(1) : 0}% of total
+                </div>
+              </div>
+              <div className={`rounded-xl p-4 ${
+                totalAllocated > 0 && (quarterlyBudget.q4 / totalAllocated) > 0.35
+                  ? 'bg-red-500/30 border-2 border-red-500 animate-pulse'
+                  : 'bg-white/10'
+              }`}>
+                <div className="text-sm text-gray-400 mb-1">Q4 (Jan-Mar) ⚠️</div>
+                <div className="text-2xl font-black text-red-400">₹{quarterlyBudget.q4.toFixed(1)} Cr</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {totalAllocated > 0 ? ((quarterlyBudget.q4 / totalAllocated) * 100).toFixed(1) : 0}% of total
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Anomaly Alert */}
         {anomalyAlert && (
           <motion.div
@@ -296,17 +383,17 @@ export default function FinancialTimelinePage() {
               <ShieldExclamationIcon className="w-12 h-12 text-red-400 flex-shrink-0" />
               <div className="flex-1">
                 <h3 className="text-2xl font-black text-red-400 mb-2">
-                  ⚠️ Year-End Bunching Detected
+                  ⚠️ Budget Allocation Anomalies Detected
                 </h3>
                 <p className="text-white mb-3">
-                  AI Anomaly Detection Model has flagged suspicious project allocation pattern:
+                  AI Anomaly Detection has flagged suspicious patterns in quarterly budget distribution:
                 </p>
-                <ul className="text-red-300 space-y-1 mb-4">
+                <ul className="text-red-300 space-y-2 mb-4 font-mono text-sm">
                   {anomalyDetails.map((detail, idx) => (
-                    <li key={idx}>• {detail}</li>
+                    <li key={idx} className="bg-black/30 p-2 rounded">{detail}</li>
                   ))}
                 </ul>
-                <div className="flex gap-3">
+                <div className="flex gap-3 flex-wrap">
                   <span className="px-4 py-2 bg-red-500 text-white rounded-lg font-bold text-sm">
                     CRITICAL ALERT
                   </span>
@@ -372,18 +459,34 @@ export default function FinancialTimelinePage() {
               {/* Month Headers */}
               <div className="grid grid-cols-[200px_repeat(12,1fr)] gap-2 mb-4">
                 <div className="font-bold text-white text-sm">Project</div>
-                {MONTHS.map((month, idx) => (
-                  <div
-                    key={month}
-                    onDragOver={handleDragOver}
-                    onDrop={() => handleDrop(idx)}
-                    className={`text-center font-bold text-sm py-2 rounded-lg ${
-                      idx >= 9 ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'
-                    }`}
-                  >
-                    {month}
-                  </div>
-                ))}
+                {MONTHS.map((month, idx) => {
+                  // Highlight Q4 (Jan-Mar) and Q3 (Oct-Dec) if anomalies detected
+                  const isQ4 = idx >= 9; // Jan-Mar
+                  const isQ3 = idx >= 6 && idx <= 8; // Oct-Dec
+                  const hasAnomalies = anomalyAlert && (isQ4 || isQ3);
+                  
+                  return (
+                    <div
+                      key={month}
+                      onDragOver={handleDragOver}
+                      onDrop={() => handleDrop(idx)}
+                      className={`text-center font-bold text-sm py-2 rounded-lg relative ${
+                        hasAnomalies && isQ4
+                          ? 'bg-red-500/30 text-red-300 border-2 border-red-500 animate-pulse'
+                          : hasAnomalies && isQ3
+                          ? 'bg-orange-500/30 text-orange-300 border-2 border-orange-500'
+                          : idx >= 9 
+                          ? 'bg-red-500/20 text-red-400' 
+                          : 'bg-blue-500/20 text-blue-400'
+                      }`}
+                    >
+                      {month}
+                      {hasAnomalies && isQ4 && (
+                        <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping" />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Project Rows */}
@@ -574,6 +677,103 @@ export default function FinancialTimelinePage() {
               >
                 Close
               </button>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Anomaly Detection Popup */}
+        {showAnomalyPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 z-50"
+            onClick={() => setShowAnomalyPopup(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, y: 50 }}
+              animate={{ scale: 1, y: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-gradient-to-br from-red-900 via-red-800 to-orange-900 border-4 border-red-500 rounded-3xl p-8 max-w-3xl w-full shadow-2xl"
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <div className="relative">
+                  <ExclamationTriangleIcon className="w-20 h-20 text-yellow-400 animate-pulse" />
+                  <div className="absolute inset-0 bg-yellow-400 blur-xl opacity-50 animate-ping" />
+                </div>
+                <div>
+                  <h2 className="text-4xl font-black text-white mb-2">
+                    🚨 ANOMALY DETECTED
+                  </h2>
+                  <p className="text-red-200 text-lg font-bold">
+                    End-Quarter Budget Bunching Pattern Identified
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-black/40 rounded-2xl p-6 mb-6">
+                <h3 className="text-xl font-black text-yellow-400 mb-4">Critical Findings:</h3>
+                <div className="space-y-3">
+                  <div className="bg-red-500/20 border-l-4 border-red-500 p-4 rounded">
+                    <p className="text-white font-bold text-lg mb-2">Quarterly Distribution Analysis</p>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-gray-400">Q1 & Q2 (First Half):</span>
+                        <span className="text-white font-bold ml-2">
+                          ₹{(quarterlyBudget.q1 + quarterlyBudget.q2).toFixed(1)} Cr
+                          ({totalAllocated > 0 ? (((quarterlyBudget.q1 + quarterlyBudget.q2) / totalAllocated) * 100).toFixed(1) : 0}%)
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Q3 & Q4 (Second Half):</span>
+                        <span className="text-red-300 font-bold ml-2">
+                          ₹{(quarterlyBudget.q3 + quarterlyBudget.q4).toFixed(1)} Cr
+                          ({totalAllocated > 0 ? (((quarterlyBudget.q3 + quarterlyBudget.q4) / totalAllocated) * 100).toFixed(1) : 0}%)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-orange-500/20 border-l-4 border-orange-500 p-4 rounded">
+                    <p className="text-orange-300 font-bold">⚠️ Detected Issues:</p>
+                    <ul className="mt-2 space-y-1 text-white text-sm">
+                      {anomalyDetails.slice(0, 5).map((detail, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <span className="text-orange-400 flex-shrink-0">►</span>
+                          <span>{detail}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="bg-yellow-500/20 border-l-4 border-yellow-500 p-4 rounded">
+                    <p className="text-yellow-300 font-bold mb-2">💡 Recommended Actions:</p>
+                    <ul className="space-y-1 text-white text-sm">
+                      <li>• Redistribute high-value projects to Q1 and Q2</li>
+                      <li>• Extend project timelines for Q4 projects to prevent rushed execution</li>
+                      <li>• Flag contractors with multiple Q4 projects for review</li>
+                      <li>• Implement quarterly spending caps to ensure even distribution</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  onClick={() => {
+                    setShowAnomalyPopup(false);
+                    router.push('/reallocation-map');
+                  }}
+                  className="flex-1 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-lg rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-lg"
+                >
+                  Open Reallocation Tool
+                </button>
+                <button
+                  onClick={() => setShowAnomalyPopup(false)}
+                  className="px-6 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-colors border-2 border-white/30"
+                >
+                  Close
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
