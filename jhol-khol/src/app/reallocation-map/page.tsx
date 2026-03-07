@@ -21,10 +21,18 @@ import type { StateData } from '@/data/budgetData';
 interface ReallocationSuggestion {
   state: string;
   district: string;
+  department: string;
   favorabilityScore: number;
   reasons: string[];
   availableCapacity: number;
   utilization: number;
+  suggestedSchemes: {
+    name: string;
+    category: string;
+    needAmount: number;
+    utilization: number;
+  }[];
+  totalTransferAmount: number;
 }
 
 export default function ReallocationMapPage() {
@@ -38,11 +46,17 @@ export default function ReallocationMapPage() {
   const [suggestions, setSuggestions] = useState<ReallocationSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState<ReallocationSuggestion | null>(null);
+  const [schemes, setSchemes] = useState<any[]>([]);
+  const [showSchemePreview, setShowSchemePreview] = useState(false);
 
   useEffect(() => {
-    async function fetchStates() {
+    async function fetchData() {
       try {
-        const statesRes = await apiClient.getBudgetStates();
+        const [statesRes, schemesRes] = await Promise.all([
+          apiClient.getBudgetStates(),
+          apiClient.getSchemes()
+        ]);
+        
         const convertedStates: StateData[] = statesRes.states.map(state => ({
           id: state.id,
           name: state.name,
@@ -51,14 +65,15 @@ export default function ReallocationMapPage() {
           districts: []
         }));
         setStates(convertedStates);
+        setSchemes(schemesRes.schemes || []);
       } catch (error) {
-        console.error('Failed to fetch states:', error);
+        console.error('Failed to fetch data:', error);
       } finally {
         setLoading(false);
       }
     }
     
-    fetchStates();
+    fetchData();
   }, []);
 
   const handleStateSelect = async (state: StateData) => {
@@ -141,13 +156,33 @@ export default function ReallocationMapPage() {
         reasons.push('Geographical diversification benefit');
       }
       
+      // Find schemes that can utilize the funds (prioritize underfunded schemes)
+      const applicableSchemes = schemes
+        .filter(scheme => 
+          scheme.utilization_pct < 80 && // Schemes with less than 80% utilization
+          scheme.status === 'Active' &&
+          scheme.unspent_amount_cr > 0
+        )
+        .slice(0, 3)
+        .map(scheme => ({
+          name: scheme.scheme_name,
+          category: scheme.department,
+          needAmount: scheme.unspent_amount_cr,
+          utilization: scheme.utilization_pct
+        }));
+      
+      const totalNeed = applicableSchemes.reduce((sum, s) => sum + s.needAmount, 0);
+      
       return {
         state: targetState.name,
         district: district.name,
+        department: applicableSchemes[0]?.category || 'General',
         favorabilityScore: Math.min(100, score),
         reasons,
         availableCapacity,
         utilization,
+        suggestedSchemes: applicableSchemes,
+        totalTransferAmount: Math.min(availableCapacity, totalNeed),
       };
     });
     
@@ -158,19 +193,46 @@ export default function ReallocationMapPage() {
   };
 
   const handleReallocation = () => {
-    if (!sourceState || !sourceDistrict || !selectedDestination || reallocationAmount <= 0) {
-      alert('Please select source, destination, and enter reallocation amount');
+    if (!sourceState || !sourceDistrict || !selectedDestination) {
+      alert('Please select source and destination');
       return;
     }
 
+    const transferAmount = reallocationAmount || selectedDestination.totalTransferAmount;
+    
+    if (transferAmount <= 0) {
+      alert('Please enter a valid transfer amount');
+      return;
+    }
+
+    // Build scheme allocation details
+    const schemeDetails = selectedDestination.suggestedSchemes.length > 0
+      ? '\n\nFunds will be allocated to:\n' + 
+        selectedDestination.suggestedSchemes.map((s, i) => 
+          `${i + 1}. ${s.name}\n   Department: ${s.category}\n   Funding Needed: ₹${s.needAmount.toFixed(2)} Cr\n   Current Utilization: ${s.utilization.toFixed(1)}%`
+        ).join('\n\n')
+      : '';
+
     // In a real system, this would call an API
     alert(
-      `Reallocation Request Submitted:\n\n` +
-      `From: ${sourceState.name} - ${sourceDistrict.name}\n` +
-      `To: ${selectedDestination.state} - ${selectedDestination.district}\n` +
-      `Amount: ₹${reallocationAmount} Cr\n\n` +
-      `Favorability Score: ${selectedDestination.favorabilityScore}/100\n` +
-      `Status: Pending approval from Finance Ministry`
+      `✅ Reallocation Request Submitted\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `FROM:\n` +
+      `  State: ${sourceState.name}\n` +
+      `  District: ${sourceDistrict.name}\n\n` +
+      `TO:\n` +
+      `  State: ${selectedDestination.state}\n` +
+      `  District: ${selectedDestination.district}\n` +
+      `  Department: ${selectedDestination.department}\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `TRANSFER DETAILS:\n` +
+      `  Amount: ₹${transferAmount.toFixed(2)} Cr\n` +
+      `  Favorability Score: ${selectedDestination.favorabilityScore}/100\n` +
+      `  Available Capacity: ₹${selectedDestination.availableCapacity.toFixed(2)} Cr\n` +
+      `${schemeDetails}\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `Status: Pending approval from Finance Ministry\n` +
+      `Expected Processing: 2-3 business days`
     );
   };
 
@@ -345,13 +407,6 @@ export default function ReallocationMapPage() {
                   <div className="mb-4 p-3 bg-white/10 rounded-xl">
                     <p className="text-xs text-gray-400 mb-1">Reallocating from:</p>
                     <p className="text-white font-bold">{sourceState.name} - {sourceDistrict.name}</p>
-                    <input
-                      type="number"
-                      value={reallocationAmount}
-                      onChange={(e) => setReallocationAmount(parseFloat(e.target.value) || 0)}
-                      placeholder="Amount (₹ Cr)"
-                      className="mt-2 w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:border-amber-400 focus:outline-none"
-                    />
                   </div>
                 )}
 
@@ -362,7 +417,10 @@ export default function ReallocationMapPage() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      onClick={() => setSelectedDestination(suggestion)}
+                      onClick={() => {
+                        setSelectedDestination(suggestion);
+                        setShowSchemePreview(true);
+                      }}
                       className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
                         selectedDestination?.district === suggestion.district
                           ? 'border-amber-400 bg-amber-500/20'
@@ -375,6 +433,9 @@ export default function ReallocationMapPage() {
                             {suggestion.district}
                           </h3>
                           <p className="text-xs text-gray-400">{suggestion.state}</p>
+                          <p className="text-xs text-blue-400 font-semibold mt-1">
+                            📋 {suggestion.department}
+                          </p>
                         </div>
                         <div className={`px-3 py-1 rounded-full text-xs font-bold ${
                           suggestion.favorabilityScore >= 80 ? 'bg-green-500 text-white' :
@@ -393,24 +454,104 @@ export default function ReallocationMapPage() {
                         ))}
                       </div>
 
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-400">Available:</span>
-                        <span className="font-bold text-green-400">
-                          ₹{suggestion.availableCapacity.toFixed(1)} Cr
-                        </span>
+                      <div className="grid grid-cols-2 gap-2 text-xs mb-2">
+                        <div>
+                          <span className="text-gray-400">Available:</span>
+                          <span className="block font-bold text-green-400">
+                            ₹{suggestion.availableCapacity.toFixed(1)} Cr
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">Can Transfer:</span>
+                          <span className="block font-bold text-amber-400">
+                            ₹{suggestion.totalTransferAmount.toFixed(1)} Cr
+                          </span>
+                        </div>
                       </div>
+
+                      {suggestion.suggestedSchemes.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-white/10">
+                          <p className="text-xs text-gray-400 mb-1">Schemes needing funds:</p>
+                          <div className="space-y-1">
+                            {suggestion.suggestedSchemes.slice(0, 2).map((scheme, i) => (
+                              <div key={i} className="text-xs">
+                                <span className="text-white">• {scheme.name.slice(0, 30)}...</span>
+                                <span className="text-amber-400 ml-1">(₹{scheme.needAmount.toFixed(1)} Cr needed)</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </motion.div>
                   ))}
                 </div>
 
-                {selectedDestination && reallocationAmount > 0 && (
-                  <button
-                    onClick={handleReallocation}
-                    className="w-full mt-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all duration-300 flex items-center justify-center gap-2"
+                {selectedDestination && showSchemePreview && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="mt-4 p-4 bg-blue-500/10 border border-blue-400/30 rounded-xl"
                   >
-                    <ArrowRightIcon className="w-5 h-5" />
-                    Submit Reallocation Request
-                  </button>
+                    <h3 className="text-white font-bold text-sm mb-3 flex items-center gap-2">
+                      <SparklesIcon className="w-4 h-4 text-blue-400" />
+                      Transfer Preview
+                    </h3>
+                    
+                    <div className="space-y-2 text-xs mb-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">From:</span>
+                        <span className="text-white font-semibold">{sourceState?.name} - {sourceDistrict?.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">To:</span>
+                        <span className="text-white font-semibold">{selectedDestination.state} - {selectedDestination.district}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Department:</span>
+                        <span className="text-blue-400 font-semibold">{selectedDestination.department}</span>
+                      </div>
+                      <div className="flex justify-between border-t border-white/10 pt-2">
+                        <span className="text-gray-400">Amount to Transfer:</span>
+                        <span className="text-amber-400 font-bold">₹{reallocationAmount || selectedDestination.totalTransferAmount.toFixed(1)} Cr</span>
+                      </div>
+                    </div>
+
+                    {selectedDestination.suggestedSchemes.length > 0 && (
+                      <div className="mb-3">
+                        <p className="text-gray-400 text-xs mb-2">Funds will be utilized by:</p>
+                        <div className="space-y-1">
+                          {selectedDestination.suggestedSchemes.map((scheme, i) => (
+                            <div key={i} className="bg-white/5 p-2 rounded text-xs">
+                              <div className="flex justify-between items-start">
+                                <span className="text-white font-semibold">{scheme.name}</span>
+                                <span className="text-xs text-gray-400">{scheme.utilization.toFixed(0)}% utilized</span>
+                              </div>
+                              <div className="flex justify-between mt-1">
+                                <span className="text-gray-400">{scheme.category}</span>
+                                <span className="text-green-400 font-semibold">₹{scheme.needAmount.toFixed(1)} Cr</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <input
+                      type="number"
+                      value={reallocationAmount}
+                      onChange={(e) => setReallocationAmount(parseFloat(e.target.value) || 0)}
+                      placeholder={`Suggested: ₹${selectedDestination.totalTransferAmount.toFixed(1)} Cr`}
+                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none text-sm mb-3"
+                    />
+
+                    <button
+                      onClick={handleReallocation}
+                      className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      <ArrowRightIcon className="w-5 h-5" />
+                      Confirm Transfer of ₹{reallocationAmount || selectedDestination.totalTransferAmount.toFixed(1)} Cr
+                    </button>
+                  </motion.div>
                 )}
               </div>
             )}
