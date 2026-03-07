@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/lib/api';
 import type { ReallocationResponse, ReallocationSuggestion } from '@/lib/api/types';
+import Link from 'next/link';
 import {
   ArrowRightIcon,
   CheckCircleIcon,
@@ -25,7 +26,7 @@ export default function ReallocationPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.getReallocationSuggestions({ limit: 20 });
+      const response = await apiClient.getReallocation();
       setData(response);
     } catch (error) {
       console.error('Failed to fetch reallocation data:', error);
@@ -61,6 +62,20 @@ export default function ReallocationPage() {
           <p className="text-gray-600 text-lg">
             Constitutional compliance + Geographic constraints + Maximum efficiency
           </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/blockchain?tab=multisig"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow transition-colors"
+            >
+              ✍️ Propose Multi-Sig Reallocation On-Chain
+            </Link>
+            <Link
+              href="/blockchain?tab=commitment"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-xl shadow transition-colors"
+            >
+              🔐 Anchor Reallocation Report On-Chain
+            </Link>
+          </div>
         </div>
 
         {/* Summary Cards */}
