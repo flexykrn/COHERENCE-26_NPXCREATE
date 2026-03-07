@@ -11,17 +11,23 @@ import pandas as pd
 import json
 import os
 from datetime import datetime
+from pathlib import Path
 
 router = APIRouter(prefix="/api/batches", tags=["batches"])
 
+# Get absolute paths
+BASE_DIR = Path(__file__).parent.parent
+DATA_DIR = BASE_DIR / "data"
+BATCH_FILE = DATA_DIR / "batches.json"
+TRANSACTIONS_FILE = DATA_DIR / "transactions.csv"
+
 # In-memory storage for batches (use database in production)
 BATCHES_STORE = []
-BATCH_FILE = "backend/data/batches.json"
 
 def ensure_batch_file():
     """Ensure batch storage file exists"""
-    if not os.path.exists(BATCH_FILE):
-        os.makedirs(os.path.dirname(BATCH_FILE), exist_ok=True)
+    if not BATCH_FILE.exists():
+        BATCH_FILE.parent.mkdir(parents=True, exist_ok=True)
         with open(BATCH_FILE, 'w') as f:
             json.dump([], f)
 
@@ -133,7 +139,7 @@ async def create_batch(request: BatchRequest):
     """Create a new batch from unbatched transactions"""
     try:
         # Load transactions
-        df = pd.read_csv('backend/data/transactions.csv')
+        df = pd.read_csv(TRANSACTIONS_FILE)
         
         # Filter by block range if specified
         if request.start_block and request.end_block:
