@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import WhistleblowerForm from '@/components/blockchain/WhistleblowerForm';
 import { 
   ExclamationTriangleIcon, 
   ArrowTrendingUpIcon,
@@ -13,6 +14,7 @@ import {
 export default function ReportsPage() {
   const [complaints, setComplaints] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [showOnChainForm, setShowOnChainForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     title: '',
@@ -100,7 +102,20 @@ location: '',
             >
               {showForm ? 'View Reports' : '+ Submit New Report'}
             </button>
+            <button
+              onClick={() => setShowOnChainForm(!showOnChainForm)}
+              className="ml-3 px-8 py-3 bg-gradient-to-r from-purple-700 to-pink-700 text-white rounded-full font-semibold hover:shadow-lg transition-all"
+            >
+              {showOnChainForm ? 'Hide' : '🕵️ Anonymous On-Chain Report'}
+            </button>
           </div>
+
+          {/* On-Chain Anonymous Whistleblower Section */}
+          {showOnChainForm && (
+            <div className="bg-gray-900 border border-purple-500/30 rounded-xl shadow-xl p-8 mb-8">
+              <WhistleblowerForm />
+            </div>
+          )}
 
           {/* Report Form */}
           {showForm && (
