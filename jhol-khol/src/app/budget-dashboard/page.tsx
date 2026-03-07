@@ -1,17 +1,16 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import IndiaMap from "@/components/IndiaMap";
 import StatePanel from "@/components/StatePanel";
 import SchemeAnalytics from "@/components/SchemeAnalytics";
+import apiClient from "@/lib/api/client";
+import type { BudgetMapState, BudgetScheme, BudgetNationalStats } from "@/lib/api/types";
 import {
-  nationalStats,
   formatCrores,
-  states,
-  schemes,
   type StateData,
   type SchemeData,
 } from "@/data/budgetData";
@@ -30,10 +29,86 @@ export default function DashboardPage() {
   const [selectedDistrictId, setSelectedDistrictId] = useState<string | null>(null);
   const [selectedScheme, setSelectedScheme] = useState<SchemeData | null>(null);
   const [view, setView] = useState<View>("map");
+  
+  // API data states
+  const [states, setStates] = useState<StateData[]>([]);
+  const [schemes, setSchemes] = useState<SchemeData[]>([]);
+  const [nationalStats, setNationalStats] = useState<BudgetNationalStats | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleStateSelect = (state: StateData) => {
-    setSelectedState(state);
-    setSelectedDistrictId(null);
+  // Fetch data from API on mount
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        
+        // Fetch all data in parallel
+        const [statesRes, schemesRes, statsRes] = await Promise.all([
+          apiClient.getBudgetStates(),
+          apiClient.getBudgetSchemesOverview(),
+          apiClient.getBudgetNationalStats(),
+        ]);
+
+        // Convert API states to StateData format
+        const convertedStates: StateData[] = statesRes.states.map(state => ({
+          id: state.id,
+          name: state.name,
+          allocated: state.allocated,
+          spent: state.spent,
+          districts: [] // Will be loaded when state is selected
+        }));
+        
+        setStates(convertedStates);
+        setNationalStats(statsRes);
+        
+        // Convert API schemes to SchemeData format
+        const convertedSchemes: SchemeData[] = schemesRes.schemes.map(scheme => ({
+          id: scheme.id,
+          name: scheme.name,
+          icon: getSchemeIcon(scheme.category),
+          allocated: scheme.allocated,
+          spent: scheme.spent,
+          utilization: scheme.utilization,
+          trend: scheme.trend,
+          category: scheme.category,
+          anomalies: [] // Simplified for now
+        }));
+        
+        setSchemes(convertedSchemes);
+      } catch (error) {
+        console.error('Failed to fetch budget data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  // Fetch state details when a state is selected
+  const handleStateSelect = async (state: StateData) => {
+    try {
+      const stateDetail = await apiClient.getBudgetStateDetail(state.id);
+      
+      // Convert to StateData format with districts
+      const fullState: StateData = {
+        id: stateDetail.id,
+        name: stateDetail.name,
+        allocated: stateDetail.allocated,
+        spent: stateDetail.spent,
+        districts: stateDetail.districts.map(d => ({
+          id: d.id,
+          name: d.name,
+          allocated: d.allocated,
+          spent: d.spent
+        }))
+      };
+      
+      setSelectedState(fullState);
+      setSelectedDistrictId(null);
+    } catch (error) {
+      console.error('Failed to fetch state details:', error);
+    }
   };
 
   const handleDistrictSelect = (districtId: string) => {
@@ -60,6 +135,43 @@ export default function DashboardPage() {
 
   const districtName =
     selectedState?.districts.find((d) => d.id === selectedDistrictId)?.name || "";
+
+  // Helper function to get scheme icon based on category
+  function getSchemeIcon(category: string): string {
+    const icons: Record<string, string> = {
+      'DBT': '💰',
+      'Free Goods': '📦',
+      'Nutrition': '🍽️',
+      'Pension': '👴',
+      'Housing': '🏠',
+      'Healthcare': '🏥',
+      'Sanitation': '♻️',
+      'Education': '📚',
+      'Infrastructure': '🏗️',
+    };
+    return icons[category] || '📊';
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-amber-400 font-bold">Loading budget data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!nationalStats) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-400 font-bold">Failed to load budget data</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -93,26 +205,26 @@ export default function DashboardPage() {
               {[
                 {
                   label: "Total Allocated",
-                  value: formatCrores(nationalStats.totalAllocated),
+                  value: `₹${nationalStats.allocated.toFixed(2)} Cr`,
                   icon: <CurrencyRupeeIcon className="w-6 h-6" />,
                   color: "amber",
                   trend: "+8.2%",
                 },
                 {
                   label: "Total Spent",
-                  value: formatCrores(nationalStats.totalSpent),
+                  value: `₹${nationalStats.spent.toFixed(2)} Cr`,
                   icon: <ChartBarIcon className="w-6 h-6" />,
                   color: "green",
                 },
                 {
-                  label: "Remaining",
-                  value: formatCrores(nationalStats.remaining),
-                  icon: <CurrencyRupeeIcon className="w-6 h-6" />,
+                  label: "Utilization",
+                  value: `${nationalStats.utilization.toFixed(1)}%`,
+                  icon: <ChartBarIcon className="w-6 h-6" />,
                   color: "orange",
                 },
                 {
                   label: "Active Alerts",
-                  value: String(nationalStats.activeAlerts),
+                  value: String(nationalStats.alerts.high_severity),
                   icon: <ExclamationTriangleIcon className="w-6 h-6" />,
                   color: "red",
                 },
@@ -167,6 +279,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <IndiaMap
+                    states={states}
                     onStateSelect={handleStateSelect}
                     selectedStateId={selectedState?.id}
                   />

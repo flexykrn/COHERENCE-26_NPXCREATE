@@ -45,6 +45,12 @@ export const API_CONFIG = {
     SCHEMES_ANOMALIES: '/api/schemes/anomalies',
     SCHEMES_DETAIL: (id: number) => `/api/schemes/${id}`,
     
+    // Budget Map
+    BUDGET_STATES: '/api/budget/states',
+    BUDGET_STATE_DETAIL: (stateId: string) => `/api/budget/states/${stateId}`,
+    BUDGET_SCHEMES_OVERVIEW: '/api/budget/schemes',
+    BUDGET_NATIONAL_STATS: '/api/budget/national-stats',
+    
     // WebSocket
     LIVE_FEED: '/ws/live-feed',
   },

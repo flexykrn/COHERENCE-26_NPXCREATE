@@ -36,8 +36,11 @@ export function useWebSocket(url: string): UseWebSocketReturn {
 
         ws.current.onmessage = (event) => {
           try {
-            const data = JSON.parse(event.data);
-            console.log('[WebSocket] Received:', data);
+            const message = JSON.parse(event.data);
+            console.log('[WebSocket] Received:', message);
+            
+            // Extract actual alert data from the wrapper
+            const data = message.data || message;
             
             const alert: AnomalyAlert = {
               id: data.id || `alert-${Date.now()}`,

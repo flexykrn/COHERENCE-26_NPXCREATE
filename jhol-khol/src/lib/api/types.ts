@@ -403,3 +403,66 @@ export interface LapseRiskQueryParams {
 export interface CollusionQueryParams {
   year?: number;
 }
+
+// ============================================================================
+// BUDGET MAP
+// ============================================================================
+
+export interface BudgetMapDistrict {
+  id: string;
+  name: string;
+  allocated: number;
+  spent: number;
+}
+
+export interface BudgetMapState {
+  id: string;
+  name: string;
+  allocated: number;
+  spent: number;
+  utilization: number;
+  districts_count?: number;
+  districts?: BudgetMapDistrict[];
+}
+
+export interface BudgetStatesResponse {
+  states: BudgetMapState[];
+  total_states: number;
+}
+
+export interface BudgetStateDetailResponse extends BudgetMapState {
+  districts: BudgetMapDistrict[];
+}
+
+export interface BudgetScheme {
+  id: string;
+  name: string;
+  category: string;
+  allocated: number;
+  spent: number;
+  utilization: number;
+  trend: number[];
+  anomaly_flag: string;
+  delivery_mode: string;
+  beneficiaries: number;
+}
+
+export interface BudgetSchemesResponse {
+  schemes: BudgetScheme[];
+  total_schemes: number;
+}
+
+export interface BudgetNationalStats {
+  allocated: number;
+  revised: number;
+  spent: number;
+  utilization: number;
+  schemes: {
+    total: number;
+    active: number;
+  };
+  alerts: {
+    total: number;
+    high_severity: number;
+  };
+}

@@ -1,17 +1,18 @@
 import { useState, useCallback, useMemo } from "react";
 import indiaMap from "@svg-maps/india";
-import { states, formatCrores, type StateData } from "@/data/budgetData";
+import { formatCrores, type StateData } from "@/data/budgetData";
 
 interface IndiaMapProps {
+  states: StateData[];
   onStateSelect: (state: StateData) => void;
   selectedStateId?: string;
 }
 
-const stateDataMap = new Map(states.map(s => [s.id, s]));
-
-const IndiaMap = ({ onStateSelect, selectedStateId }: IndiaMapProps) => {
+const IndiaMap = ({ states, onStateSelect, selectedStateId }: IndiaMapProps) => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  
+  const stateDataMap = useMemo(() => new Map(states.map(s => [s.id, s])), [states]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();

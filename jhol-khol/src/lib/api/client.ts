@@ -28,6 +28,10 @@ import type {
   SchemeSummaryResponse,
   SchemeAnomalyResponse,
   SchemeDetailResponse,
+  BudgetStatesResponse,
+  BudgetStateDetailResponse,
+  BudgetSchemesResponse,
+  BudgetNationalStats,
   AnomalyQueryParams,
   BudgetFlowQueryParams,
   LapseRiskQueryParams,
@@ -205,6 +209,24 @@ export const apiClient = {
 
   async getSchemeDetail(id: number): Promise<SchemeDetailResponse> {
     return fetchApi<SchemeDetailResponse>(API_CONFIG.ENDPOINTS.SCHEMES_DETAIL(id));
+  },
+
+  // ── Budget Map ────────────────────────────────────────────────────────────
+  
+  async getBudgetStates(): Promise<BudgetStatesResponse> {
+    return fetchApi<BudgetStatesResponse>(API_CONFIG.ENDPOINTS.BUDGET_STATES);
+  },
+
+  async getBudgetStateDetail(stateId: string): Promise<BudgetStateDetailResponse> {
+    return fetchApi<BudgetStateDetailResponse>(API_CONFIG.ENDPOINTS.BUDGET_STATE_DETAIL(stateId));
+  },
+
+  async getBudgetSchemesOverview(): Promise<BudgetSchemesResponse> {
+    return fetchApi<BudgetSchemesResponse>(API_CONFIG.ENDPOINTS.BUDGET_SCHEMES_OVERVIEW);
+  },
+
+  async getBudgetNationalStats(): Promise<BudgetNationalStats> {
+    return fetchApi<BudgetNationalStats>(API_CONFIG.ENDPOINTS.BUDGET_NATIONAL_STATS);
   },
 };
 
