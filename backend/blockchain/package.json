@@ -1,0 +1,22 @@
+{
+  "name": "coherence-blockchain",
+  "version": "1.0.0",
+  "description": "Hardhat project + merkle batching scripts for COHERENCE-26",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy:hoodi": "hardhat run scripts/deploy.js --network hoodi",
+    "batch": "node scripts/batch.js",
+    "test": "hardhat test"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.22.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.4.0",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.3.11"
+  }
+}
