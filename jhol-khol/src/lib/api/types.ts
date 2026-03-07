@@ -89,7 +89,7 @@ export interface AnomalyScanResponse {
 export interface BudgetFlowNode {
   id: string;
   name: string;
-  type: 'ministry' | 'department' | 'district';
+  type: 'ministry' | 'department' | 'district' | 'ddo';
 }
 
 export interface BudgetFlowLink {

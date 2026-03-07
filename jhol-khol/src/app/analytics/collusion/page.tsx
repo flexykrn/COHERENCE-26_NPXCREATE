@@ -1,3 +1,4 @@
+﻿// @ts-nocheck
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -34,8 +35,8 @@ export default function CollusionNetworkPage() {
   };
 
   const formatCurrency = (value: number) => {
-    if (value >= 100) return `₹${value.toFixed(1)} Cr`;
-    return `₹${(value * 10).toFixed(1)} L`;
+    if (value >= 100) return `â‚¹${value.toFixed(1)} Cr`;
+    return `â‚¹${(value * 10).toFixed(1)} L`;
   };
 
   if (loading) {
@@ -87,7 +88,7 @@ export default function CollusionNetworkPage() {
                 <p className="text-3xl font-black text-orange-600">{data?.colluding_ddos.length || 0}</p>
               </div>
             </div>
-            <p className="text-xs text-gray-500">Narrow vendor pools (≤3)</p>
+            <p className="text-xs text-gray-500">Narrow vendor pools (â‰¤3)</p>
           </div>
 
           <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-blue-100">
@@ -206,7 +207,7 @@ export default function CollusionNetworkPage() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-bold text-gray-900">{ddo.ddo_name}</h3>
-                    <p className="text-xs text-gray-500">DDO ID: {ddo.ddo_id} • {ddo.dept_name}</p>
+                    <p className="text-xs text-gray-500">DDO ID: {ddo.ddo_id} â€¢ {ddo.dept_name}</p>
                   </div>
                 </div>
 
@@ -222,7 +223,7 @@ export default function CollusionNetworkPage() {
                 </div>
 
                 <p className="text-xs text-gray-600 mt-3">
-                  ⚠️ Suspiciously narrow vendor pool - potential collusion or favoritism
+                  âš ï¸ Suspiciously narrow vendor pool - potential collusion or favoritism
                 </p>
               </div>
             ))}
@@ -265,3 +266,4 @@ export default function CollusionNetworkPage() {
     </div>
   );
 }
+

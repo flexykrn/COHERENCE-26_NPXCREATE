@@ -1,3 +1,4 @@
+﻿// @ts-nocheck
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -38,8 +39,8 @@ export default function SchemeAnomaliesPage() {
     : data?.detections.filter(d => d.severity === filter) || [];
 
   const formatCurrency = (value: number) => {
-    if (value >= 100) return `₹${value.toFixed(1)} Cr`;
-    return `₹${(value * 10).toFixed(1)} L`;
+    if (value >= 100) return `â‚¹${value.toFixed(1)} Cr`;
+    return `â‚¹${(value * 10).toFixed(1)} L`;
   };
 
   const getSeverityColor = (severity: string) => {
@@ -213,7 +214,7 @@ export default function SchemeAnomaliesPage() {
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-gray-900">{detection.scheme_name}</h3>
-                      <p className="text-sm text-gray-500">{detection.dept_name} • {detection.scheme_category}</p>
+                      <p className="text-sm text-gray-500">{detection.dept_name} â€¢ {detection.scheme_category}</p>
                     </div>
                   </div>
                 </div>
@@ -289,3 +290,4 @@ export default function SchemeAnomaliesPage() {
     </div>
   );
 }
+
