@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { apiClient, type AnomaliesResponse, type Anomaly } from '@/lib/api';
+import Link from 'next/link';
 import { ExclamationTriangleIcon, FunnelIcon } from '@heroicons/react/24/outline';
 
 export default function AnomaliesPage() {
@@ -62,6 +63,20 @@ export default function AnomaliesPage() {
           <p className="text-gray-600 text-lg">
             AI-powered financial anomaly detection and analysis
           </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/blockchain?tab=slash"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl shadow transition-colors"
+            >
+              ⚡ Slash Flagged Entities On-Chain
+            </Link>
+            <Link
+              href="/blockchain?tab=commitment"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-xl shadow transition-colors"
+            >
+              🔐 Anchor This Report On-Chain
+            </Link>
+          </div>
         </div>
 
         {/* Filters */}
