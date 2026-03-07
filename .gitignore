@@ -31,6 +31,13 @@ out/
 build/
 dist/
 
+# Hardhat files
+cache/
+artifacts/
+deployed-contracts/
+batch-submissions/
+typechain-types/
+
 # Logs
 *.log
 npm-debug.log*

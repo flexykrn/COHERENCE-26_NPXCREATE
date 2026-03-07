@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
-from routes import overview, anomalies, budget_flow, lapse, reallocation, collusion, anomaly_engine, ml_lapse, budget_dna, ddo_benchmarks, schemes, budget_map, vendors, ledger, merkle
+from routes import overview, anomalies, budget_flow, lapse, reallocation, collusion, anomaly_engine, ml_lapse, budget_dna, ddo_benchmarks, schemes, budget_map, vendors, ledger, merkle, batches
 # Commenting out model loader due to TensorFlow version conflicts
 # from model_loader import model_loader
 
@@ -86,6 +86,7 @@ app.include_router(schemes.router,         prefix="/api")
 app.include_router(vendors.router,         prefix="/api")
 app.include_router(ledger.router)           # Blockchain ledger
 app.include_router(merkle.router)           # Merkle proofs
+app.include_router(batches.router)          # Merkle batches for rollup
 
 # ── Health check ─────────────────────────────────────────────────────────────
 @app.get("/health")

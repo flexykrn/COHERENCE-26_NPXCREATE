@@ -1,0 +1,40 @@
+{
+  "name": "coherence-blockchain-rollup",
+  "version": "1.0.0",
+  "description": "Government Budget Transparency Platform with Blockchain Rollup",
+  "scripts": {
+    "deploy": "hardhat run scripts/deploy.js",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network hoodiTestnet",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network hoodiMainnet",
+    "submit-batch": "hardhat run scripts/submit-batch.js",
+    "submit-batch:testnet": "hardhat run scripts/submit-batch.js --network hoodiTestnet",
+    "submit-batch:mainnet": "hardhat run scripts/submit-batch.js --network hoodiMainnet",
+    "verify-tx": "hardhat run scripts/verify-transaction.js",
+    "verify-tx:testnet": "hardhat run scripts/verify-transaction.js --network hoodiTestnet",
+    "verify-tx:mainnet": "hardhat run scripts/verify-transaction.js --network hoodiMainnet",
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "clean": "hardhat clean",
+    "node": "hardhat node"
+  },
+  "keywords": [
+    "blockchain",
+    "rollup",
+    "government",
+    "budget",
+    "transparency",
+    "merkle-tree",
+    "smart-contract"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "dotenv": "^16.3.1",
+    "node-fetch": "^2.7.0"
+  }
+}

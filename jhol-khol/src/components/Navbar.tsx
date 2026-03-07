@@ -12,6 +12,7 @@ export default function Navbar() {
     { name: 'Budget Map', href: '/budget-dashboard' },
     { name: 'Timeline', href: '/financial-timeline' },
     { name: 'Blockchain', href: '/blockchain' },
+    { name: 'Batches', href: '/batches' },
     { name: 'Reallocation', href: '/reallocation-map' },
     { name: 'Schemes', href: '/schemes' },
     { name: 'Reports', href: '/reports' },
