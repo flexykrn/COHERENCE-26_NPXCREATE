@@ -8,7 +8,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigation = [
-    { name: 'Home', href: '/' },
+    { name: 'Dashboard', href: '/budget-dashboard' },
     { name: 'Budget Map', href: '/budget-dashboard' },
     { name: 'Timeline', href: '/financial-timeline' },
     { name: 'Blockchain', href: '/blockchain' },
