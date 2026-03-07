@@ -1,0 +1,26 @@
+scheme_id,scheme_name,scheme_category,dept_id,launch_year,target_beneficiaries_lakhs,per_beneficiary_amount_inr,delivery_mode,annual_budget_cr,fy2022_disbursed_cr,fy2022_beneficiaries_reached,fy2023_disbursed_cr,fy2023_beneficiaries_reached,fy2024_allocated_cr,fy2024_disbursed_cr,fy2024_beneficiaries_reached,fy2024_utilization_pct,anomaly_flag,active
+1,PM Kisan Samman Nidhi,DBT,21,2019,18.0,6000,DBT-Bank,756.0,672.22,1443943,678.39,1607053,774.05,675.97,1387683,87.3,normal,1
+2,Free Laptop Scheme,Free Goods,11,2016,1.2,32000,Physical,268.8,224.55,95061,228.31,94598,307.62,238.85,83900,77.6,year_end_dump,1
+3,Midday Meal Programme,Nutrition,13,2002,9.5,1200,School-Kitchen,79.8,69.87,804074,67.52,745571,87.39,82.08,852751,93.9,normal,1
+4,Sanjay Gandhi Niradhar Yojana,Pension,15,1981,2.2,15000,DBT-Bank,231.0,183.1,175422,192.42,177876,255.08,242.45,196849,95.0,normal,1
+5,Indira Gandhi Old Age Pension,Pension,15,2007,3.5,12000,DBT-Bank,294.0,300.46,338288,287.97,337264,310.11,289.53,408984,93.4,ghost,1
+6,PM Awas Yojana (Gramin),Housing,28,2016,4.5,130000,DBT-Installment,4095.0,3642.14,362565,3306.65,342765,4389.52,4146.66,375322,94.5,normal,1
+7,PM Ujjwala Gas Connection,Free Goods,29,2016,2.8,1600,Physical,31.36,19.76,167111,17.61,145181,35.5,7.64,51293,21.5,stranded,1
+8,Mahatma Phule Jan Arogya,Health Ins,6,2012,9.0,5000,Insurance-Card,315.0,274.38,771180,306.38,792575,358.67,300.13,738490,83.7,normal,1
+9,Widow Pension Scheme,Pension,15,1994,1.8,15000,DBT-Bank,189.0,171.45,168758,173.77,143929,213.21,219.47,214331,102.9,ghost,1
+10,Disability Pension,Pension,15,1996,0.85,18000,DBT-Bank,107.1,92.75,71342,85.39,65047,115.13,108.32,70518,94.1,normal,1
+11,Free Cycle Scheme (9th Std),Free Goods,11,2009,0.5,4500,Physical,15.75,15.15,43799,13.45,40452,16.52,13.95,36341,84.5,normal,1
+12,PM Matru Vandana Yojana,DBT,8,2017,1.4,5000,DBT-Bank,49.0,38.05,106844,40.71,110961,55.12,48.69,108655,88.3,year_end_dump,1
+13,MGNREGS Wage Payment,Employment,26,2005,22.0,22400,DBT-Bank,3449.6,3049.19,1839485,3122.59,1804186,3719.77,3119.14,1684794,83.9,normal,1
+14,National Food Security (PDS),Nutrition,13,2013,31.0,1800,Ration-Shop,390.6,358.28,2601577,363.54,2916295,423.07,353.24,2283071,83.5,normal,1
+15,PM SHRI School Upgradation,Education,11,2022,0.3,2500000,Grant-School,5250.0,3385.44,18314,3731.69,18846,5557.5,424.12,2278,7.6,stranded,1
+16,Post-Matric SC/ST Scholarship,Education,15,1944,0.95,42000,DBT-Bank,279.3,255.18,77237,271.6,88033,293.43,267.4,75142,91.1,normal,1
+17,PM Kisan Mandhan (Pension),Pension,21,2019,1.1,36000,DBT-Bank,277.2,188.38,66154,160.28,63860,293.55,48.2,16208,16.4,stranded,1
+18,Jal Jeevan Mission (Har Ghar),Infrastructure,29,2019,4.0,85000,Infrastructure,2380.0,2284.65,379249,2316.73,345415,2685.56,2238.85,318635,83.4,normal,1
+19,PM Fasal Bima (Crop Ins.),DBT,24,2016,5.5,8500,Insurance-Claim,327.25,287.77,480192,267.59,437043,359.53,286.29,419413,79.6,year_end_dump,1
+20,SHG Women Revolving Fund,DBT,30,2011,0.75,50000,DBT-SHG,262.5,243.38,63106,212.9,62785,293.04,248.88,59413,84.9,normal,1
+21,Free Sanitation (SBM Grameen),Free Goods,29,2014,3.2,12000,Construction,268.8,191.99,217723,147.7,179082,304.25,56.39,58409,18.5,stranded,1
+22,Annapurna Free Grains (BPL),Nutrition,13,2000,2.8,600,Ration-Shop,11.76,10.76,258682,11.61,264615,12.03,11.33,253394,94.2,normal,1
+23,ASHA Incentive Payment,DBT,8,2005,0.48,20000,DBT-Bank,67.2,62.45,41381,65.27,44869,71.21,68.24,62540,95.8,ghost,1
+24,PM SVANidhi (Street Vendor),DBT,30,2020,0.62,10000,DBT-Bank,43.4,42.09,53248,36.19,50769,49.74,41.15,44972,82.7,normal,1
+25,Ex-Servicemen Welfare Fund,Pension,45,1972,0.24,72000,DBT-Bank,120.96,111.73,21132,106.48,19450,137.93,111.76,18099,81.0,normal,1

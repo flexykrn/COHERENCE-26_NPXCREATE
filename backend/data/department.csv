@@ -1,0 +1,51 @@
+id,name,ministry,major_head_code,scheme_type
+1,Revenue,Finance,2014,revenue
+2,Expenditure,Finance,2015,revenue
+3,Audit & Compliance,Finance,2016,revenue
+4,Debt Management,Finance,2017,revenue
+5,Tax Administration,Finance,2052,revenue
+6,Hospitals & Medical,Health,2210,revenue
+7,Medicines & Procurement,Health,2211,capital
+8,ASHA & Community Health,Health,2212,revenue
+9,Disease Control,Health,2213,revenue
+10,Medical Infrastructure,Health,4210,capital
+11,Primary & Elementary Ed,Education,2202,revenue
+12,Higher Education,Education,2203,revenue
+13,Midday Meal Scheme,Education,2204,revenue
+14,Digital Education,Education,2205,capital
+15,Scholarship & Welfare,Education,2206,revenue
+16,National Highways,Infrastructure,3054,capital
+17,Rural Roads (PMGSY),Infrastructure,5054,capital
+18,Bridges & Flyovers,Infrastructure,5055,capital
+19,Smart Cities Mission,Infrastructure,5056,capital
+20,Urban Transport,Infrastructure,3056,capital
+21,Irrigation & Canals,Agriculture,2701,capital
+22,Fertilizer Subsidy,Agriculture,2415,revenue
+23,Cold Storage & Warehousing,Agriculture,2416,capital
+24,Crop Insurance (PMFBY),Agriculture,2702,revenue
+25,Drip & Micro Irrigation,Agriculture,2703,capital
+26,Rural Employment (MGNREGS),Rural Development,2505,revenue
+27,PMGSY Roads,Rural Development,5054,capital
+28,Housing for All (PMAY),Rural Development,2216,capital
+29,Drinking Water (JJM),Rural Development,2215,capital
+30,Self Help Groups,Rural Development,2506,revenue
+31,Railway Infrastructure,Railways,3002,capital
+32,Rolling Stock,Railways,3003,capital
+33,Station Redevelopment,Railways,5002,capital
+34,Safety & Signaling,Railways,3004,capital
+35,Electrification,Railways,5003,capital
+36,Grid Infrastructure,Power,4801,capital
+37,Solar Mission,Power,4802,capital
+38,Rural Electrification,Power,2801,capital
+39,Energy Conservation,Power,2802,revenue
+40,Nuclear Power,Power,2803,capital
+41,Defence Procurement,Defence,2076,capital
+42,Border Infrastructure,Defence,4076,capital
+43,Ordnance & Supplies,Defence,2077,capital
+44,Coast Guard,Defence,2078,revenue
+45,Ex-Servicemen Welfare,Defence,2079,revenue
+46,Smart Policing,Home Affairs,2055,capital
+47,Border Management,Home Affairs,2056,capital
+48,Disaster Management,Home Affairs,2245,revenue
+49,Census & Statistics,Home Affairs,2251,revenue
+50,Central Armed Forces,Home Affairs,2057,revenue
